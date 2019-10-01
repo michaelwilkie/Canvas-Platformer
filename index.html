@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+        <title>Canvas Platformer</title>
+
+    <style>
+        body, html
+        {
+            background-color: darkslategray;
+        }
+
+    </style>
+</head>
+
+<body>
+    <script src="src/platformer_func.js"   ></script> <!-- Game loop and other useful functions -->
+    <script src="src/layer.js"             ></script> <!-- Layer class, manages drawing         -->
+    <script src="src/level.js"             ></script> <!-- Level class                          -->
+    <script src="src/camera.js"            ></script> <!-- Camera object class                  -->
+    <script src="src/key.js"               ></script> <!-- Key class                            -->
+    <script src="src/keyboardhandler.js"   ></script> <!-- Keyboard Input Handling              -->
+    <script src="src/platformer_globals.js"></script> <!-- Global variable definitions          -->
+    <script src="src/tables.js"            ></script> <!-- Global variables of large tables     -->
+    <script src="src/entity.js"            ></script> <!-- Base class for almost all objects    -->
+    <script src="src/player.js"            ></script> <!-- Basic player class                   -->
+    <script src="src/puck.js"              ></script> <!-- Old bouncy ball class, may repurpose -->
+    <script src="src/wall.js"              ></script> <!-- Wall with basic collision detection  -->
+    <script src="src/trigger.js"           ></script> <!-- Subclass of Wall that causes events  -->
+    <script src="src/goal.js"              ></script> <!-- Subclass of trigger, may repurpose   -->
+    <script src="src/scoreboard.js"        ></script> <!-- Display informational text to player -->
+    <script src="src/tile.js"              ></script> <!-- Interface to Wall, saves resources   -->
+    <script src="src/particle.js"          ></script> <!-- Basic particle fx class              -->
+
+    
+    <canvas id="myCanvas" crossOrigin="anonymous" style="display: flex;margin: 0 auto;border: 3px solid black;" width="800" height="600">
+        Canvas not supported by your browser
+    </canvas>
+               
+    <div style="color:white;">
+        Canvas Platformer by Michael Wilkie
+    </div>
+
+</body>
+
+</html>
