@@ -10,33 +10,63 @@
         {
             background-color: darkslategray;
         }
+        #stage 
+        {
+            width: 800px;
+            height: 600px;
+            //position: relative;
+            //border: 2px solid black;
+        }
 
+        canvas          
+        { 
+            position: absolute; 
+            display: flex;
+            margin: 0 auto;
+            border: 3px solid black;
+        }
+        #ui_canvas      { z-index: 2        ; }
+        #game_canvas    { z-index: 1        ; }
     </style>
+
 </head>
 
 <body>
-    <script src="src/platformer_func.js"   ></script> <!-- Game loop and other useful functions -->
-    <script src="src/layer.js"             ></script> <!-- Layer class, manages drawing         -->
-    <script src="src/level.js"             ></script> <!-- Level class                          -->
-    <script src="src/camera.js"            ></script> <!-- Camera object class                  -->
-    <script src="src/key.js"               ></script> <!-- Key class                            -->
-    <script src="src/keyboardhandler.js"   ></script> <!-- Keyboard Input Handling              -->
-    <script src="src/platformer_globals.js"></script> <!-- Global variable definitions          -->
-    <script src="src/tables.js"            ></script> <!-- Global variables of large tables     -->
-    <script src="src/entity.js"            ></script> <!-- Base class for almost all objects    -->
-    <script src="src/player.js"            ></script> <!-- Basic player class                   -->
-    <script src="src/puck.js"              ></script> <!-- Old bouncy ball class, may repurpose -->
-    <script src="src/wall.js"              ></script> <!-- Wall with basic collision detection  -->
-    <script src="src/trigger.js"           ></script> <!-- Subclass of Wall that causes events  -->
-    <script src="src/goal.js"              ></script> <!-- Subclass of trigger, may repurpose   -->
-    <script src="src/scoreboard.js"        ></script> <!-- Display informational text to player -->
-    <script src="src/tile.js"              ></script> <!-- Interface to Wall, saves resources   -->
-    <script src="src/particle.js"          ></script> <!-- Basic particle fx class              -->
+    <script src="src/game/platformer_func.js"   ></script> <!-- Game loop and other useful functions -->
+    <script src="src/game/animationhandler.js"  ></script> <!-- Animation list operation handling    -->
+    <script src="src/game/animation.js"         ></script> <!-- Sprite animation handling            -->
+    <script src="src/game/tileset_info.js"      ></script> <!-- Tileset table                        -->
+    <script src="src/game/layer.js"             ></script> <!-- Layer class, manages drawing         -->
+    <script src="src/game/level.js"             ></script> <!-- Level class                          -->
+    <script src="src/game/camera.js"            ></script> <!-- Camera object class                  -->
+    <script src="src/game/key.js"               ></script> <!-- Key class                            -->
+    <script src="src/game/keyboardhandler.js"   ></script> <!-- Keyboard Input Handling              -->
+    <script src="src/game/platformer_globals.js"></script> <!-- Global variable definitions          -->
+    <script src="src/game/tables.js"            ></script> <!-- Global variables of large tables     -->
+    <script src="src/game/entity.js"            ></script> <!-- Base class for almost all objects    -->
+    <script src="src/game/player.js"            ></script> <!-- Basic player class                   -->
+    <script src="src/game/puck.js"              ></script> <!-- Old bouncy ball class, may repurpose -->
+    <script src="src/game/wall.js"              ></script> <!-- Wall with basic collision detection  -->
+    <script src="src/game/trigger.js"           ></script> <!-- Subclass of Wall that causes events  -->
+    <script src="src/game/goal.js"              ></script> <!-- Subclass of trigger, may repurpose   -->
+    <script src="src/game/scoreboard.js"        ></script> <!-- Display informational text to player -->
+    <script src="src/game/tile.js"              ></script> <!-- Interface to Wall, saves resources   -->
+    <script src="src/game/particle.js"          ></script> <!-- Basic particle fx class              -->
+    <script src="src/ui/ui_globals.js"          ></script> <!-- Global variable definitions for UI   -->
+    <script src="src/ui/ui_func.js"             ></script> <!-- Functions for UI                     -->
+    <script src="src/ui/menu.js"                ></script> <!-- Base class for Menus                 -->
+    <script src="src/ui/label.js"               ></script> <!-- Label class for basic UI components  -->
+    <script src="src/ui/menuitem.js"            ></script> <!-- Base class for MenuItems             -->
+    <script src="src/initialize.js"             ></script> <!-- Initialization of game objects       -->
 
-    
-    <canvas id="myCanvas" crossOrigin="anonymous" style="display: flex;margin: 0 auto;border: 3px solid black;" width="800" height="600">
-        Canvas not supported by your browser
-    </canvas>
+    <div id="stage">
+        <canvas id="game_canvas" crossOrigin="anonymous" width="800" height="600">
+            Canvas not supported by your browser
+        </canvas>
+        <canvas id="ui_canvas" width="800" height="600">
+            Canvas not supported by your browser
+        </canvas>
+    </div>
                
     <div style="color:white;">
         Canvas Platformer by Michael Wilkie
