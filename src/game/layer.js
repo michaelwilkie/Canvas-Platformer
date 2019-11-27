@@ -15,6 +15,7 @@
 //     you will see:       draw(camera.x * Layer.speed + ent.pos.x, camera.y * Layer.speed + ent.pos.y)      //
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 "use strict";
+
 class Layer
 {
     // speed defaults to 1

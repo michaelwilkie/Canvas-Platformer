@@ -1,0 +1,5 @@
+There already exists collision detection code for simple rectangles and points
+
+Add functionality so that 2 objects that collide with each other
+are properly handled so that they do not get stuck inside each other or move
+unnaturally

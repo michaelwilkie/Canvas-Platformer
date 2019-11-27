@@ -5,6 +5,7 @@
 //     its animation sequence.                              //
 //////////////////////////////////////////////////////////////
 "use strict";
+
 class Animation
 {
     constructor(width, height, animation_index, framelist)

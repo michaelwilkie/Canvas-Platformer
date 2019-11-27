@@ -1,4 +1,9 @@
+////////////////////////////////////////////////////////////////////////////////
+// wall.js                                                                    //
+//     Basic class that uses rectangular collision detections and resolution. //
+////////////////////////////////////////////////////////////////////////////////
 "use strict";
+
 class Wall extends Entity
 {
     constructor(x, y, w, h, imgsrc, framelist)

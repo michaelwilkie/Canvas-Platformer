@@ -1,10 +1,13 @@
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//                                              class Tile                                                 //
-// The purpose of the Tile class is to help with performance that the ordinary Wall class doesn't provide. //
-// Each entity is dumb and creates a whole new image when given a source path.                             //
-// The Tile class accepts an Image object to sidestep the whole src to img process.                        //
-// Mainly to prevent a million copies of the tileset being created.                                        //
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////
+// tile.js                                                                              //
+//     The purpose of the Tile class is to help with performance that the ordinary      //
+//     Wall class doesn't provide.                                                      //
+//     Each entity is dumb and creates a whole new image when given a source path.      //
+//     The Tile class accepts an Image object to sidestep the whole src to img process, //                    
+//     mainly to prevent a million copies of the tileset being created.                 //
+//////////////////////////////////////////////////////////////////////////////////////////
+"use strict";
+
 class Tile extends Wall
 {
     constructor(x, y, w, h, framelist, xoffset, yoffset, img)

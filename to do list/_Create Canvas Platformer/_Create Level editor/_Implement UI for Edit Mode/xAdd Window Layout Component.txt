@@ -1,0 +1,40 @@
+**** This is being scrapped                                 ****
+**** It might as well have been another UI_Component class  ****
+**** I'll just make subclasses of UI_Component              ****
+**** Not every thing needs to be absolutely as generic as   ****
+****    possible                                            ****
+
+Add a basic window layout component
+
+This will organize UI_Components to follow a certain layout
+These layouts will vary but one that needs to be done now is an N Column layout and a Grid layout
+
+2 Column Layout:
++-----------------------------+
+| UI_Component | UI_Component |
+|       A      |       B      |
+|              |              |
+|              |              |
++-----------------------------+
+
+Grid layout (n, m):
+n = 4, m = 4
++--------------------------------------------------------------------------------------------+
+|                                       UI_Component                                         |
+|    +----------------+    +----------------+    +----------------+    +----------------+    |
+|    | UI_Component 1 |    | UI_Component 2 |    | UI_Component 3 |    | UI_Component 4 |    |
+|    +----------------+    +----------------+    +----------------+    +----------------+    |
+|                                                                                            |
+|    +----------------+    +----------------+    +----------------+    +----------------+    |
+|    | UI_Component 5 |    | UI_Component 6 |    | UI_Component 7 |    | UI_Component 8 |    |
+|    +----------------+    +----------------+    +----------------+    +----------------+    |
+|                                                                                            |
+|    +----------------+    +----------------+    +----------------+    +----------------+    |
+|    | UI_Component 9 |    | UI_Component 10|    | UI_Component 11|    | UI_Component 12|    |
+|    +----------------+    +----------------+    +----------------+    +----------------+    |
+|                                                                                            |
+|    +----------------+    +----------------+    +----------------+    +----------------+    |
+|    | UI_Component 13|    | UI_Component 14|    | UI_Component 15|    | UI_Component 16|    |
+|    +----------------+    +----------------+    +----------------+    +----------------+    |
+|                                                                                            |
++--------------------------------------------------------------------------------------------+

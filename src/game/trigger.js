@@ -1,4 +1,12 @@
+/////////////////////////////////////////////////////////////////////
+// trigger.js                                                      //
+//     Invisible wall that triggers things on collision detection. //
+//     This class is inspired from Valve's Hammer Editor where     //
+//     events are triggered based on the physical interaction      //
+//     with these objects.                                         //
+/////////////////////////////////////////////////////////////////////
 "use strict";
+
 class Trigger extends Entity
 {
     constructor(x, y, w, h, color="darkred", imgsrc, framelist)

@@ -1,4 +1,11 @@
+//////////////////////////////////////////////////////////////////
+// puck.js                                                      //
+//     Old bouncy ball class used in different Canvas projects. //
+//     It may be repurposed as you can do a lot of things with  //
+//     these bouncy objects.                                    //
+//////////////////////////////////////////////////////////////////
 "use strict";
+
 class Puck extends Entity
 {
     constructor(x, y, w, h, velX, velY, imgsrc, framelist)

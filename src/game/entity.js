@@ -1,4 +1,3 @@
-"use strict";
 ///////////////////////////////////////////////////////////////////////////////////////
 //      class Entity                                                                 //
 // Base class to all objects (I think so).                                           //
@@ -29,6 +28,8 @@
 // animfinished  :      false              boolean value to reset frame to 0         //
 // framecooldown :      10                                                           //
 ///////////////////////////////////////////////////////////////////////////////////////
+"use strict";
+
 class Entity
 {
     constructor(x, y, w, h, imgsrc, framelist, layer=0)
@@ -81,7 +82,7 @@ class Entity
     {
         for (var i = 0; i < entlist.length; i++)
             if (entlist[i] == this)
-                entlist.splice(i, 1);        
+                entlist.splice(i, 1);
     }
     draw(camera, layerspeed=1, width=null, height=null)
     {        
@@ -125,7 +126,7 @@ class Entity
     {
         // Friction handling
         // Friction values that are too high will cause the entity to get stuck on the ground.
-        // The approach function helps with not going above or below zero.
+        // The approach function helps with not overshooting in its approach to 0.
         // Other methods I've tried made the velocity oscillate on either side of 0 (resulting in jittery side to side motion).
         if (this.yCollide) this.vel.x = approach(0, this.vel.x, this.friction.x);
         if (this.xCollide) this.vel.y = approach(0, this.vel.y, this.friction.y);

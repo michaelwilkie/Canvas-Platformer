@@ -1,7 +1,8 @@
-"use strict";
 /****************************************************/
 /* Game global variables (most of them anyway)      */
 /****************************************************/
+"use strict";
+
 var DEBUG_MODE = false;
 
 var MEDIA_DIR = "materials/"
@@ -11,9 +12,10 @@ var game_ctx;
 
 // Mouse position
 // Will be used for menus
-var mousepos      = {x: 0, y: 0};
-var mousestartpos = {x: 0, y: 0};
+var mousepos         = {x: 0, y: 0};
+var mousestartpos    = {x: 0, y: 0};
 var mdown            = false;
+var mlastdown        = false;
 var MOUSE_DEBUG_MODE = false;
 
 // Enumerator for parallelaxing

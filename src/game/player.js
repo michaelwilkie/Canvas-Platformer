@@ -1,3 +1,7 @@
+////////////////////////////////////////////////////////////////////
+// player.js                                                      //
+//     The player class that the user will interact with directly //
+////////////////////////////////////////////////////////////////////
 "use strict";
 
 // This correlates to the current sprite sheet being used.
@@ -76,7 +80,7 @@ class Player extends Entity
         if (keyhandler.isDown   ("Right")) { this.moveRight(); }
 
         this.currentAnimation.update();
-        console.log("Frame: " + this.currentAnimation.frame);
+        if (DEBUG_MODE) console.log("Frame: " + this.currentAnimation.frame);
 
         // If I'm not moving, I want to face the direction I was just running in
         if (Math.abs(this.vel.x) < 1 && this.yCollide)

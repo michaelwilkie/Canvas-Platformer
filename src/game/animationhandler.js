@@ -1,7 +1,12 @@
-// For handling a list of Animations.
-// This will decide which animation will be shown.
-// There will be one AnimationHandler per Entity.
-// So far it is being fitted to the player.
+/////////////////////////////////////////////////////////
+// animationhandler.js                                 //
+//     For handling a list of Animations.              //
+//     This will decide which animation will be shown. //
+//     There will be one AnimationHandler per Entity.  //
+//     So far it is being fitted to the player.        //
+/////////////////////////////////////////////////////////
+"use strict";
+
 class AnimationHandler
 {
     constructor()

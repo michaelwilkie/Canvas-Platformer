@@ -1,4 +1,12 @@
+////////////////////////////////////////////////////////////////
+// scoreboard.js                                              //
+//     Old scoreboard class used in previous Canvas projects. //
+//     Used to display the score of something on the screen.  //
+//     I may repurpose eventually when it's time to display   //
+//     some sort of scoring mechanism on the screen.          //
+////////////////////////////////////////////////////////////////
 "use strict";
+
 class ScoreBoard
 {
     constructor()

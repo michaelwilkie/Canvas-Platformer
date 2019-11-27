@@ -27,6 +27,8 @@ for (var x = 0; x < vendors.length && !window.requestAnimationFrame; ++x)
 // Initialize the key handler with basic movement keys.                 //
 // Initialize tileset texture.                                          //
 // Initialize and sort the 'layers' array.                              //
+// Initialize user interface components.                                //
+// Register mouse events.                                               //
 //////////////////////////////////////////////////////////////////////////
 $(document).ready(function () 
 {
@@ -45,8 +47,8 @@ $(document).ready(function ()
 
     // Set level boundaries
     level = new Level(/*MEDIA_DIR + "gray.png"*/);
-    background_wall  = addWall(0,   0, null, null, MEDIA_DIR + "trees_fg.png"); // create background wall object
-    background_wall2 = addWall(0,   0, null, null, MEDIA_DIR + "trees_bg.png"); // create background wall object
+    background_wall  = addWall(0, 0, null, null, MEDIA_DIR + "trees_fg.png"); // create background wall object
+    background_wall2 = addWall(0, 0, null, null, MEDIA_DIR + "trees_bg.png"); // create background wall object
     
     // Load the tileset image.
     tileset_img = new Image();
@@ -86,12 +88,29 @@ $(document).ready(function ()
         return a.speed - b.speed;
     });
 
-    ui_fps_label = new Label("test", 50, 50, 100, 100);
+    ui_fps_label = new UI_Label("test", 50, 50, 100, 100);
     ui_fps_label.update = function()
     {
         this.setText(round_to(player.pos.x, 2));
     }
     ui_component_list.push(ui_fps_label);
+
+    ui_canvas.addEventListener('mousedown', function (event)
+    {
+        console.log('clickity clockity');
+        mdown = true;
+        mousestartpos = getMousePos(event);
+        mousepos = mousestartpos;
+    });
+    ui_canvas.addEventListener('mousemove', function (event)
+    {
+        mousepos = getMousePos(event);
+    });
+    ui_canvas.addEventListener('mouseup', function (event)
+    {
+        mdown = false;
+        mousepos = getMousePos(event);
+    });
 
     CanvasPlatformer();
 });

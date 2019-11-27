@@ -1,0 +1,4 @@
+A player should be able to store certain objects in his
+inventory
+
+A player will collect these objects if he collides with them

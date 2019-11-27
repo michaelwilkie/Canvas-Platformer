@@ -1,0 +1,4 @@
+If a filename starts with * it is in progress
+If a filename starts with ! it is blocked
+If a filename starts with x it is cancelled
+Files whose objectives are completed should be deleted

@@ -1,4 +1,12 @@
+//////////////////////////////////////////////////////////
+// goal.js                                              //
+//     An extension of the Trigger class where any puck //
+//     that collides with it will score a goal.         //
+//     This is deprecated for now, I may repurpose this //
+//     when I need some sort of goal entity.            //
+//////////////////////////////////////////////////////////
 "use strict";
+
 class Goal extends Trigger
 {
     constructor(x, y, w, h, color)

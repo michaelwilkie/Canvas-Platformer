@@ -1,4 +1,13 @@
+////////////////////////////////////////////////////////////
+// particle.js                                            //
+//     The particle effects class that generates a sprite //
+//     that lasts a few seconds before it fades.          //
+//     It is currently deprecated right now, I will       //
+//     repurpose this later when I need to implement      //
+//     particle effects.                                  //
+////////////////////////////////////////////////////////////
 "use strict";
+
 class Particle extends Entity
 {
     constructor(x, y, w, h, scale, imgsrc, framelist)

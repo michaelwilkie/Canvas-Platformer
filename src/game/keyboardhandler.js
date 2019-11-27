@@ -1,4 +1,3 @@
-"use strict";
 //////////////////////////////////////////////////////////////////////////////////////////
 //                                     class KeyHandler                                 //
 // This class is it make it easier for me to handle keyboard input.                     //
@@ -17,9 +16,9 @@
 // |      keydown     |  function  |    none    |  and sets isPressed to true         | //
 // |                  |            |            |                                     | //
 // +------------------+------------+------------+-------------------------------------+ //
+// |                  |            |            |   Determines which key is pressed   | //
+// |      keyup       |  function  |    none    |   and sets isPressed to false       | //
 // |                  |            |            |                                     | //
-// |      keyup       |  function  |    none    |   Determines which key is pressed   | //
-// |                  |            |            |   and sets isPressed to false       | //
 // +------------------+------------+------------+-------------------------------------+ //
 // |                  |            |            |   Loops through keylist and assigns | //
 // |updateLastKeypress|  function  |    none    |   lastPressed of each element to    | //
@@ -50,6 +49,8 @@
 // |                  |            |            |   not pressed in the last frame     | //
 // +------------------+------------+------------+-------------------------------------+ //
 //////////////////////////////////////////////////////////////////////////////////////////
+"use strict";
+
 class KeyHandler
 {
     constructor()
