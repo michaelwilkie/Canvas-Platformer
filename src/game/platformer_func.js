@@ -61,7 +61,6 @@ function getRandomNumber(lower, upper)
 {
     return Math.floor((Math.random() * (upper - lower)) + lower);
 }
-
 ////////////////////////////////////////////////////////
 //                  getMousePos                       //
 // Function:                                          //
@@ -80,7 +79,6 @@ function getMousePos(e)
         y: e.clientY - rect.top
     };
 }
-
 ////////////////////////////////////////////////////////
 //                  getTouchPos                       //
 // Function:                                          //
@@ -154,7 +152,9 @@ function colorNameToHex(color)
 //     the color to be black or white.   //
 // Return value:                         //
 //     string                            //
-///////////////////////////////////////////
+// Source:                               /////////////////////////////////////////////////////////////////////////
+// https://stackoverflow.com/questions/35969656/how-can-i-generate-the-opposite-color-according-to-current-color//
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 function invertColor(hex, bw) 
 {
     if (hex.indexOf('#') === 0) 
@@ -512,10 +512,9 @@ function addWall(x, y, w, h, imgsrc)
 // Return value:                        //
 //     Tile object                      //
 //////////////////////////////////////////
-function addTile(x, y, tilename)
+function addTile(x, y, tileset_elem)
 {
-    var t = tileset[tilename];
-    var obj = new Tile(x, y, t.w, t.h, [0], t.x, t.y, tileset_img);
+    var obj = new Tile(x, y, tileset_elem.w, tileset_elem.h, [0], tileset_elem.x, tileset_elem.y, tileset_img);
     entlist.push(obj);
     return obj;
 }

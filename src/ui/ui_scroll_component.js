@@ -12,10 +12,10 @@ class UI_Scroll_Component extends UI_Component
     {
         super();
 
-        this.x           = x          ;
-        this.y           = y          ;
-        this.width       = width      ;
-        this.height      = height     ;
+        this.x                    = x     ;
+        this.y                    = y     ;
+        this.width                = width ;
+        this.height               = height;
 
         this.current_horizontal_x = x ; // for scrollbar click drag 
         this.current_horizontal_y = y ; // for scrollbar click drag 
@@ -23,11 +23,13 @@ class UI_Scroll_Component extends UI_Component
         this.current_vertical_x   = x ; // for scrollbar click drag 
         this.current_vertical_y   = y ; // for scrollbar click drag 
 
-        this.innerwidth  = innerwidth ;
-        this.innerheight = innerheight;
+        this.innerwidth           = innerwidth ;
+        this.innerheight          = innerheight;
 
-        this.clickedOnHorizontal = false;
-        this.clickedOnVertical   = false;
+        this.clickedOnHorizontal  = false;
+        this.clickedOnVertical    = false;
+
+        this.selectedObject       = null; // for dragging and dropping objects
 
         this.horizontal_scrollbar = this.initialize_horizontal_scrollbar();
         this.vertical_scrollbar   = this.initialize_vertical_scrollbar  ();
@@ -61,7 +63,6 @@ class UI_Scroll_Component extends UI_Component
         //
         // scrollbar width is some ratio
         //  between actual width and inner width
-        //
         //
         var width_ratio = this.width / this.innerwidth;
         if (width_ratio >= 1)
@@ -128,13 +129,59 @@ class UI_Scroll_Component extends UI_Component
     }
     update()
     {
+        ///////////////////////////////////////////////////////////////////
+        // Press down   : Checking for tiles I clicked                   //
+        // Down         : Checking if I'm grabbing a scrollbar           //
+        // Press up     : Saving position of scrollbar or tile I clicked //
+        ///////////////////////////////////////////////////////////////////
+
+        // Press down
+        if (mdown && !mlastdown)
+        {
+            /////////////////////////////////////////
+            // Clicked a tile inside the component //
+            /////////////////////////////////////////
+            if (null == this.selectedObject)
+            {
+                ///////////////////////////
+                // Which one did I click //
+                ///////////////////////////
+                var bFoundObject = false;
+                for (var i = 0; i < this.component_list.length; i++)
+                {
+                    var elem = this.component_list[i];
+                    if (elem instanceof Entity)
+                    {
+                        console.log("looking 4 1: (" + elem.pos.x + ", " + elem.pos.y + ") (" + elem.w + ", " + elem.h + ")");
+                        console.log("             (" + mousestartpos.x + ", " + mousestartpos.y + ")");
+                        if (checkPointCollision(elem, mousestartpos))
+                        {
+                            this.selectedObject = elem;
+                            console.log("oboy i found 1");
+                            break;
+                        }
+                    }
+                }
+                if (null == this.selectedObject)
+                {
+
+                }
+            }
+        }
+        // Down
         if (mdown)
         {
             if (DEBUG_MODE) console.log('ui_scroll_component: ' + 'clicking');
+            //////////////////////////////////////
+            // Clicked the horizontal scrollbar //
+            //////////////////////////////////////
             if (checkPointCollision(this.horizontal_scrollbar, mousestartpos))
             {
                 this.clickedOnHorizontal = true;
             }
+            ////////////////////////////////////
+            // Clicked the vertical scrollbar //
+            ////////////////////////////////////
             else if (checkPointCollision(this.vertical_scrollbar, mousestartpos))
             {
                 this.clickedOnVertical = true;
@@ -189,48 +236,50 @@ class UI_Scroll_Component extends UI_Component
                 this.vertical_scrollbar.y = this.y + this.height - this.vertical_scrollbar.height;
             }
         }
+
+        // Press up
         if (mlastdown && !mdown)
         {
-            this.current_horizontal_x = this.horizontal_scrollbar.x;
-            this.current_horizontal_y = this.horizontal_scrollbar.y;
-            this.current_vertical_x = this.vertical_scrollbar.x;
-            this.current_vertical_y = this.vertical_scrollbar.y;
+            this.current_horizontal_x = this.horizontal_scrollbar.x ;
+            this.current_horizontal_y = this.horizontal_scrollbar.y ;
+            this.current_vertical_x   = this.vertical_scrollbar.x   ;
+            this.current_vertical_y   = this.vertical_scrollbar.y   ;
         }
     }
     draw()
     {
-        // The area inside the scroll region
-        fillBox(this.x, this.y, this.width, this.height,"rgba(123, 123, 123, 0.5)");
-
-        // The scrollbars
-
-        // Horizontal scrollbar
-        if (this.horizontal_scrollbar != null)
-        {
-            fillBox
-            (
-                this.horizontal_scrollbar.x     , 
-                this.horizontal_scrollbar.y     , 
-                this.horizontal_scrollbar.width , 
-                this.horizontal_scrollbar.height,
-                "rgba(10, 10, 10, 0.7)"
-            );
-        }
-        // Vertical scrollbar
-        if (this.vertical_scrollbar != null)
-        {
-            fillBox
-            (
-                this.vertical_scrollbar.x     , 
-                this.vertical_scrollbar.y     , 
-                this.vertical_scrollbar.width , 
-                this.vertical_scrollbar.height,
-                "rgba(10, 10, 10, 0.7)"
-            );
-        }
-
         if (this.bDrawable)
         {
+            // The area inside the scroll region
+            fillBox(this.x, this.y, this.width, this.height,"rgba(123, 123, 123, 0.5)");
+
+            // The scrollbars
+
+            // Horizontal scrollbar
+            if (this.horizontal_scrollbar != null)
+            {
+                fillBox
+                (
+                    this.horizontal_scrollbar.x     , 
+                    this.horizontal_scrollbar.y     , 
+                    this.horizontal_scrollbar.width , 
+                    this.horizontal_scrollbar.height,
+                    "rgba(10, 10, 10, 0.7)"
+                );
+            }
+            // Vertical scrollbar
+            if (this.vertical_scrollbar != null)
+            {
+                fillBox
+                (
+                    this.vertical_scrollbar.x     , 
+                    this.vertical_scrollbar.y     , 
+                    this.vertical_scrollbar.width , 
+                    this.vertical_scrollbar.height,
+                    "rgba(10, 10, 10, 0.7)"
+                );
+            }
+        
             var scroll_bar_component = this;
             
             this.component_list.forEach(function(component)
@@ -245,10 +294,35 @@ class UI_Scroll_Component extends UI_Component
                 {
                     yoffset = -scroll_bar_component.vertical_scrollbar.y;
                 }
-                component.draw(xoffset, yoffset);
+                if (component instanceof UI_Component)
+                {
+                    component.draw(xoffset, yoffset);
+                }
+                else
+                {
+                    component.draw_on_UI(xoffset, yoffset);
+                    drawBox
+                    (
+                        component.pos.x + xoffset, 
+                        component.pos.y + yoffset, 
+                        component.w, 
+                        component.h, 
+                        "black");
+                }
             });
+            if (null != this.selectedObject)
+            {
+                fillBox
+                (
+                    this.selectedObject.pos.x, 
+                    this.selectedObject.pos.y, 
+                    this.selectedObject.w    , 
+                    this.selectedObject.h    ,
+                    "rgba(60, 10, 10, 0.3)"
+                );
+            }
         }
-        
+        // Culling function
         invertedClearRect(this.x, this.y, this.width, this.height);
     }
 }

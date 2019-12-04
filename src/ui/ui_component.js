@@ -35,10 +35,13 @@ class UI_Component
     {
         if (this.bDrawable)
         {
-            this.component_list.forEach(function(component)
-            {
-                component.draw(xoffset, yoffset);
-            });
+            this.component_list.forEach
+            (
+                function(component)
+                {
+                    component.draw(xoffset, yoffset);
+                }
+            );
         }
     }
     ////////////////////////////////////////////////////////////

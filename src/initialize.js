@@ -69,8 +69,8 @@ $(document).ready(function ()
     //     framelist,
     //     xoffset, yoffset,
     //     img
-    var t = tileset["TOP_BRIGHT_CONCAVE_MIDDLE"];
-    tile1 = addTile(500, 500, t.name); //new Tile(500, 500, t.w, t.h, [0], t.x, t.y, tileset_img);
+    var tileset_element = getTileByName("LADDER");
+    tile1 = addTile(500, 500, tileset_element);
 
     layers.push(new Layer(  1)); // 1 is the default speed multiplier
     layers.push(new Layer(0.5)); // move 0.5 times as fast as the foreground
@@ -88,12 +88,15 @@ $(document).ready(function ()
         return a.speed - b.speed;
     });
 
+    /*
     ui_fps_label = new UI_Label("test", 50, 50, 100, 100);
     ui_fps_label.update = function()
     {
         this.setText(round_to(player.pos.x, 2));
     }
     ui_component_list.push(ui_fps_label);
+    */
+    initialize_edit_mode_tiles();
 
     ui_canvas.addEventListener('mousedown', function (event)
     {

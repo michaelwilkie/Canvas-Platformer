@@ -6,7 +6,7 @@
 ////////////////////////////////////////////////////////////
 "use strict";
 
-class UI_Label
+class UI_Label extends UI_Component
 {
     constructor(text, x, y, width, height, 
     font             = ui_default_font, 
@@ -14,6 +14,7 @@ class UI_Label
     text_color       = ui_default_text_color, 
     background_color = ui_default_background_color)
     {
+        super();
         this.text             = text            ;
         this.x                = x               ;
         this.y                = y               ;
