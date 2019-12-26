@@ -93,13 +93,18 @@ function drawText(text, x, y, color, alignment="center", font, fontsize)
 // Return value:                                                     //
 //     none                                                          //
 ///////////////////////////////////////////////////////////////////////
-function drawBox(x, y, w, h, style)
+function drawBox(x, y, w, h, style, lineWidth=2)
 {
+    var old_width = ui_ctx.lineWidth;
+    var old_style = ui_ctx.strokeStyle;
     ui_ctx.strokeStyle = style;
     ui_ctx.beginPath();
     ui_ctx.rect(x, y, w, h);
+    ui_ctx.lineWidth = lineWidth;
     ui_ctx.stroke();
 
+    ui_ctx.lineWidth = old_width;
+    ui_ctx.strokeStyle = old_style;
     return;
 }
 
@@ -139,7 +144,7 @@ function invertedClearRect(x, y, w, h)
     if (y > 0)                  { ui_ctx.clearRect(rect1.x, rect1.y, rect1.w, rect1.h); }
     if (y + h < SCREEN_HEIGHT)  { ui_ctx.clearRect(rect2.x, rect2.y, rect2.w, rect2.h); }
     if (x > 0)                  { ui_ctx.clearRect(rect3.x, rect3.y, rect3.w, rect3.h); }
-    if (x + w < SCREEN_WIDTH)   { ui_ctx.clearRect(rect4.x, rect4.y, rect4.w, rect4.h); }
+    if (x + w < SCREEN_WIDTH )  { ui_ctx.clearRect(rect4.x, rect4.y, rect4.w, rect4.h); }
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////

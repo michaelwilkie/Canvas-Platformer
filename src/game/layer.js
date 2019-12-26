@@ -49,6 +49,7 @@ class Layer
     remove(e)
     {
         for (var i = 0; i < this.entlist.length; i++)
+        {
             if (this.entlist[i] == e)
             {
                 removed = e;
@@ -56,6 +57,6 @@ class Layer
                 e.killSelf();
                 return;
             }
-        
+        }
     }
 }

@@ -108,7 +108,9 @@ class AnimationHandler
     /////////////////////////////////////////////////////////////////////////////////////
     getCurrentAnimation()
     {
+        var a = null;
         var bFoundNullAction = false;
+        
         for (var i = 0; i < this.animations.length; i++)
         {
             a = this.animations[i];
@@ -136,7 +138,8 @@ class AnimationHandler
                 return a;
             }
         }
-        // I got nothin jack
+        
+        // Found nothing
         return null;
     }
 }

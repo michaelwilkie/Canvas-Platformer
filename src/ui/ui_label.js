@@ -43,8 +43,8 @@ class UI_Label extends UI_Component
         drawText
         (
             this.text, 
-            (this.x + 50) + xoffset, 
-            (this.y + 50) + yoffset, 
+            this.x + xoffset, 
+            this.y + yoffset, 
             this.text_color, 
             "center", 
             this.font, 

@@ -129,19 +129,19 @@ class UI_Scroll_Component extends UI_Component
     }
     update()
     {
-        ///////////////////////////////////////////////////////////////////
-        // Press down   : Checking for tiles I clicked                   //
-        // Down         : Checking if I'm grabbing a scrollbar           //
-        // Press up     : Saving position of scrollbar or tile I clicked //
-        ///////////////////////////////////////////////////////////////////
+        //////////////////////////////////////////////////////////
+        // Press down   : Checking for tiles I clicked          //
+        // Down         : Checking if I'm grabbing a scrollbar  //
+        // Press up     : Saving position of scrollbar          //
+        //////////////////////////////////////////////////////////
 
-        // Press down
-        if (mdown && !mlastdown)
+        ///////////////////////////////////////////
+        // Only allow interaction if I'm visible //
+        ///////////////////////////////////////////
+        if (this.bDrawable)
         {
-            /////////////////////////////////////////
-            // Clicked a tile inside the component //
-            /////////////////////////////////////////
-            if (null == this.selectedObject)
+            // Press down
+            if (mdown && !mlastdown)
             {
                 ///////////////////////////
                 // Which one did I click //
@@ -152,98 +152,123 @@ class UI_Scroll_Component extends UI_Component
                     var elem = this.component_list[i];
                     if (elem instanceof Entity)
                     {
-                        console.log("looking 4 1: (" + elem.pos.x + ", " + elem.pos.y + ") (" + elem.w + ", " + elem.h + ")");
-                        console.log("             (" + mousestartpos.x + ", " + mousestartpos.y + ")");
-                        if (checkPointCollision(elem, mousestartpos))
+                        var rect = {x: elem.pos.x, y: elem.pos.y, width: elem.width, height: elem.height};
+                        
+                        ///////////////////////////////////////////////
+                        // Accounting for the scroll bar being moved //
+                        ///////////////////////////////////////////////
+                        var xoffset = 0;
+                        var yoffset = 0;
+                        if (this.horizontal_scrollbar != null)
                         {
+                            xoffset = this.horizontal_scrollbar.x;
+                        }
+                        if (this.vertical_scrollbar != null)
+                        {
+                            yoffset = this.vertical_scrollbar.y;
+                        }
+                        var adjusted_mouse_position = {x: mousestartpos.x + xoffset, y: mousestartpos.y + yoffset};
+
+                        if (checkPointCollision(rect, adjusted_mouse_position))
+                        {
+                            /////////////////////////////////////////
+                            // Clicked a tile inside the component //
+                            /////////////////////////////////////////
                             this.selectedObject = elem;
-                            console.log("oboy i found 1");
+                            bFoundObject = true;
+
+                            mouseselectedentity = addTile(mousepos.x, mousepos.y, getTileByName(this.selectedObject.name));
+                            mousedif = {x: mousepos.x - mouseselectedentity.pos.x, y: mousepos.y - mouseselectedentity.pos.y};
                             break;
                         }
                     }
                 }
-                if (null == this.selectedObject)
+                ///////////////////////////////////////////
+                // Unclicked a tile inside the component //
+                ///////////////////////////////////////////
+                if (false == bFoundObject)
                 {
-
+                    this.selectedObject = null;
                 }
             }
-        }
-        // Down
-        if (mdown)
-        {
-            if (DEBUG_MODE) console.log('ui_scroll_component: ' + 'clicking');
-            //////////////////////////////////////
-            // Clicked the horizontal scrollbar //
-            //////////////////////////////////////
-            if (checkPointCollision(this.horizontal_scrollbar, mousestartpos))
-            {
-                this.clickedOnHorizontal = true;
-            }
-            ////////////////////////////////////
-            // Clicked the vertical scrollbar //
-            ////////////////////////////////////
-            else if (checkPointCollision(this.vertical_scrollbar, mousestartpos))
-            {
-                this.clickedOnVertical = true;
-            }
-            
-            // checkPointCollision is expecting a rectangle who has a 'w' property.
-            // I don't want to break other code using this function, so I'm fixing it here
-            // intead of there.
-            if (this.horizontal_scrollbar != null)
-            {
-                this.horizontal_scrollbar.w = this.horizontal_scrollbar.width;
-                this.horizontal_scrollbar.h = this.horizontal_scrollbar.height;
-            }
-            
-            if (this.vertical_scrollbar != null)
-            {
-                this.vertical_scrollbar.w = this.vertical_scrollbar.width;
-                this.vertical_scrollbar.h = this.vertical_scrollbar.height;
-            }
-        }
-        else
-        {
-            this.clickedOnHorizontal = false;
-            this.clickedOnVertical   = false;
-        }
-        if (this.clickedOnHorizontal)
-        {
-            // I use this.current_horizontal_x to save the scrollbar's starting position
-            this.horizontal_scrollbar.x = this.current_horizontal_x + (mousepos.x - mousestartpos.x);
-            
-            // this.x being the scroll area container
-            if (this.horizontal_scrollbar.x < this.x)
-            {
-                this.horizontal_scrollbar.x = this.x;
-            }
-            if (this.horizontal_scrollbar.x + this.horizontal_scrollbar.width > this.x + this.width)
-            {
-                this.horizontal_scrollbar.x = this.x + this.width - this.horizontal_scrollbar.width;
-            }
-        }
-        else if (this.clickedOnVertical)
-        {
-            this.vertical_scrollbar.y = this.current_vertical_y + (mousepos.y - mousestartpos.y);
 
-            // this.y being the scroll area container
-            if (this.vertical_scrollbar.y < this.y)
+            // Down
+            if (mdown)
             {
-                this.vertical_scrollbar.y = this.y;
+                if (DEBUG_MODE) console.log('ui_scroll_component: ' + 'clicking');
+                //////////////////////////////////////
+                // Clicked the horizontal scrollbar //
+                //////////////////////////////////////
+                if (checkPointCollision(this.horizontal_scrollbar, mousestartpos))
+                {
+                    this.clickedOnHorizontal = true;
+                }
+                ////////////////////////////////////
+                // Clicked the vertical scrollbar //
+                ////////////////////////////////////
+                else if (checkPointCollision(this.vertical_scrollbar, mousestartpos))
+                {
+                    this.clickedOnVertical = true;
+                }
+                
+                // checkPointCollision is expecting a rectangle who has a 'w' property.
+                // I don't want to break other code using this function, so I'm fixing it here
+                // intead of there.
+                if (this.horizontal_scrollbar != null)
+                {
+                    this.horizontal_scrollbar.width  = this.horizontal_scrollbar.width;
+                    this.horizontal_scrollbar.height = this.horizontal_scrollbar.height;
+                }
+                
+                if (this.vertical_scrollbar != null)
+                {
+                    this.vertical_scrollbar.width  = this.vertical_scrollbar.width;
+                    this.vertical_scrollbar.height = this.vertical_scrollbar.height;
+                }
             }
-            if (this.vertical_scrollbar.y + this.vertical_scrollbar.height > this.y + this.height)
+            else
             {
-                this.vertical_scrollbar.y = this.y + this.height - this.vertical_scrollbar.height;
+                this.clickedOnHorizontal = false;
+                this.clickedOnVertical   = false;
             }
-        }
+            if (this.clickedOnHorizontal)
+            {
+                // I use this.current_horizontal_x to save the scrollbar's starting position
+                this.horizontal_scrollbar.x = this.current_horizontal_x + (mousepos.x - mousestartpos.x);
+                
+                // this.x being the scroll area container
+                if (this.horizontal_scrollbar.x < this.x)
+                {
+                    this.horizontal_scrollbar.x = this.x;
+                }
+                if (this.horizontal_scrollbar.x + this.horizontal_scrollbar.width > this.x + this.width)
+                {
+                    this.horizontal_scrollbar.x = this.x + this.width - this.horizontal_scrollbar.width;
+                }
+            }
+            else if (this.clickedOnVertical)
+            {
+                this.vertical_scrollbar.y = this.current_vertical_y + (mousepos.y - mousestartpos.y);
 
-        // Press up
-        if (mlastdown && !mdown)
-        {
-            this.current_horizontal_x = this.horizontal_scrollbar.x ;
-            this.current_horizontal_y = this.horizontal_scrollbar.y ;
-            this.current_vertical_x   = this.vertical_scrollbar.x   ;
-            this.current_vertical_y   = this.vertical_scrollbar.y   ;
+                // this.y being the scroll area container
+                if (this.vertical_scrollbar.y < this.y)
+                {
+                    this.vertical_scrollbar.y = this.y;
+                }
+                if (this.vertical_scrollbar.y + this.vertical_scrollbar.height > this.y + this.height)
+                {
+                    this.vertical_scrollbar.y = this.y + this.height - this.vertical_scrollbar.height;
+                }
+            }
+
+            // Press up
+            if (mlastdown && !mdown)
+            {
+                this.current_horizontal_x = this.horizontal_scrollbar.x ;
+                this.current_horizontal_y = this.horizontal_scrollbar.y ;
+                this.current_vertical_x   = this.vertical_scrollbar.x   ;
+                this.current_vertical_y   = this.vertical_scrollbar.y   ;
+            }
         }
     }
     draw()
@@ -253,7 +278,9 @@ class UI_Scroll_Component extends UI_Component
             // The area inside the scroll region
             fillBox(this.x, this.y, this.width, this.height,"rgba(123, 123, 123, 0.5)");
 
-            // The scrollbars
+            ////////////////////
+            // The scrollbars //
+            ////////////////////
 
             // Horizontal scrollbar
             if (this.horizontal_scrollbar != null)
@@ -281,19 +308,20 @@ class UI_Scroll_Component extends UI_Component
             }
         
             var scroll_bar_component = this;
-            
+            var xoffset = 0;
+            var yoffset = 0;
+
+            if (this.horizontal_scrollbar != null)
+            {
+                xoffset = -this.horizontal_scrollbar.x;
+            }
+            if (this.vertical_scrollbar != null)
+            {
+                yoffset = -this.vertical_scrollbar.y;
+            }
+
             this.component_list.forEach(function(component)
             {
-                var xoffset = 0;
-                var yoffset = 0;
-                if (scroll_bar_component.horizontal_scrollbar != null)
-                {
-                    xoffset = -scroll_bar_component.horizontal_scrollbar.x;
-                }
-                if (scroll_bar_component.vertical_scrollbar != null)
-                {
-                    yoffset = -scroll_bar_component.vertical_scrollbar.y;
-                }
                 if (component instanceof UI_Component)
                 {
                     component.draw(xoffset, yoffset);
@@ -305,20 +333,22 @@ class UI_Scroll_Component extends UI_Component
                     (
                         component.pos.x + xoffset, 
                         component.pos.y + yoffset, 
-                        component.w, 
-                        component.h, 
-                        "black");
+                        component.width          , 
+                        component.height         , 
+                        "black"
+                    );
                 }
             });
-            if (null != this.selectedObject)
+            if (this.selectedObject != null)
             {
-                fillBox
+                drawBox
                 (
-                    this.selectedObject.pos.x, 
-                    this.selectedObject.pos.y, 
-                    this.selectedObject.w    , 
-                    this.selectedObject.h    ,
-                    "rgba(60, 10, 10, 0.3)"
+                    this.selectedObject.pos.x + xoffset, /* x          */
+                    this.selectedObject.pos.y + yoffset, /* y          */
+                    this.selectedObject.width          , /* width      */
+                    this.selectedObject.height         , /* height     */
+                    "red"                              , /* line color */ 
+                    4                                    /* line width */ 
                 );
             }
         }

@@ -43,8 +43,8 @@ class Entity
         this.angle = 0;
         this.anglerate = 0;
         this.scale = 1;
-        this.w = w;
-        this.h = h;
+        this.width = w;
+        this.height = h;
         this.noCollide = false;
         this.xCollide = false;
         this.yCollide = false;
@@ -55,13 +55,13 @@ class Entity
         {
             this.img = new Image();
             this.img.src = imgsrc;
-            if (this.w == null || this.h == null)
+            if (this.width == null || this.height == null)
             {
                 var wall = this;
                 this.img.onload = function()
                 {
-                    wall.w = this.width;
-                    wall.h = this.height;
+                    wall.width = this.width;
+                    wall.height = this.height;
                 };
             }
         }
@@ -90,7 +90,7 @@ class Entity
         {
             game_ctx.setTransform(this.scale, 0, 0, this.scale, this.pos.x, this.pos.y); // sets scale and origin
             game_ctx.rotate(this.angle * Math.PI / 180);        
-            game_ctx.drawImage(this.img, this.framelist[this.frame] * this.w, 0, this.w, this.h, 0, 0, this.w, this.h);
+            game_ctx.drawImage(this.img, this.framelist[this.frame] * this.width, 0, this.width, this.height, 0, 0, this.width, this.height);
             game_ctx.setTransform(1,0,0,1,0,0);
         }*/
         if (this.img != null)
@@ -99,24 +99,28 @@ class Entity
             {
                 if (width == null && height == null)
                 {
-                    game_ctx.drawImage(this.img,
-                        this.framelist[this.frame] * this.w,
-                        this.framerow * this.h, 
-                        this.w, this.h, 
-                        this.pos.x - (camera.x * layerspeed) + camera.screenpartitionx, 
-                        this.pos.y - (camera.y * layerspeed) + camera.screenpartitiony, 
-                        this.w, this.h
+                    game_ctx.drawImage
+                    (
+                        this.img,                                                       /* img object                            */
+                        this.framelist[this.frame] * this.width,                        /* source x                              */
+                        this.framerow * this.height,                                    /* source y                              */
+                        this.width, this.height,                                        /* source width, source height           */
+                        this.pos.x - (camera.x * layerspeed) + camera.screenpartitionx, /* destination x                         */
+                        this.pos.y - (camera.y * layerspeed) + camera.screenpartitiony, /* destination y                         */
+                        this.width, this.height                                         /* destination width, destination height */
                     );
                 }
                 else
                 {
-                    game_ctx.drawImage(this.img,
-                        this.framelist[this.frame] * width,
-                        this.framerow * height, 
-                        width, height, 
-                        this.pos.x - (camera.x * layerspeed) + camera.screenpartitionx, 
-                        this.pos.y - (camera.y * layerspeed) + camera.screenpartitiony, 
-                        width, height
+                    game_ctx.drawImage
+                    (
+                        this.img,                                                       /* img object                            */
+                        this.framelist[this.frame] * width,                             /* source x                              */
+                        this.framerow * height,                                         /* source y                              */
+                        width, height,                                                  /* source width, source height           */
+                        this.pos.x - (camera.x * layerspeed) + camera.screenpartitionx, /* destination x                         */
+                        this.pos.y - (camera.y * layerspeed) + camera.screenpartitiony, /* destination y                         */
+                        width, height                                                   /* destination width, destination height */
                     );
                 }
             }
@@ -124,13 +128,16 @@ class Entity
     }
     update()
     {
-        // Friction handling
-        // Friction values that are too high will cause the entity to get stuck on the ground.
-        // The approach function helps with not overshooting in its approach to 0.
-        // Other methods I've tried made the velocity oscillate on either side of 0 (resulting in jittery side to side motion).
+        //////////////////////////////////////////////////////////////////////////////
+        // Friction handling:                                                       //
+        // Friction values that are too high will cause the entity to get stuck on  //
+        // the ground.                                                              //
+        // The approach function helps with not overshooting in its approach to 0.  //
+        // Other methods I've tried made the velocity oscillate on either side of 0 //
+        // (resulting in jittery side to side motion).                              //
+        //////////////////////////////////////////////////////////////////////////////
         if (this.yCollide) this.vel.x = approach(0, this.vel.x, this.friction.x);
         if (this.xCollide) this.vel.y = approach(0, this.vel.y, this.friction.y);
-
 
         this.vel.x+=this.gravity.x;
         this.vel.y+=this.gravity.y;
@@ -148,10 +155,14 @@ class Entity
     }
     keepInBounds()
     {
-        if (this.pos.x + this.w > level.width)  
+        if (this instanceof Wall)
+        {
+            return;
+        }
+        if (this.pos.x + this.width > level.width)  
         {
             this.xCollide = true;
-            this.pos.x = level.width - this.w;
+            this.pos.x = level.width - this.width;
         }
         else if (this.pos.x < 0)
         {
@@ -162,10 +173,10 @@ class Entity
         {
             this.xCollide = false;
         }
-        if (this.pos.y + this.h > level.height) 
+        if (this.pos.y + this.height > level.height) 
         {
             this.yCollide = true;
-            this.pos.y = level.height - this.h;
+            this.pos.y = level.height - this.height;
         }
         else if (this.pos.y < 0) 
         {

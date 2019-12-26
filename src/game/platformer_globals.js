@@ -14,15 +14,23 @@ var game_ctx;
 // Will be used for menus
 var mousepos         = {x: 0, y: 0};
 var mousestartpos    = {x: 0, y: 0};
+
+var mousedif      = {x: 0, y: 0};
+var mousedragbox  = {x: 0, y: 0, width: 0, height: 0};
+
+var mouseselectedentity = null; // for drag and drop
+
 var mdown            = false;
 var mlastdown        = false;
 var MOUSE_DEBUG_MODE = false;
 
+var GRID_TIGHTNESS = 32; // tightens the grid
+
 // Enumerator for parallelaxing
 var LAYER_ENUM = {
-    FOREGROUND1: 0,
-    BACKGROUND1: 1,
-    BACKGROUND2: 2
+    "FOREGROUND1": 0,
+    "BACKGROUND1": 1,
+    "BACKGROUND2": 2
 };
 
 var layers = [];                                // used for parallelaxing, might not contain all entities

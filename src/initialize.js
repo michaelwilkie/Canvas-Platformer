@@ -46,8 +46,8 @@ $(document).ready(function ()
     playercamera.setZoom(2, 2); // setting 2x zoom
 
     // Set level boundaries
-    level = new Level(/*MEDIA_DIR + "gray.png"*/);
-    background_wall  = addWall(0, 0, null, null, MEDIA_DIR + "trees_fg.png"); // create background wall object
+    level = new Level();
+    background_wall  = addWall(0, 100, null, null, MEDIA_DIR + "trees_fg.png"); // create background wall object
     background_wall2 = addWall(0, 0, null, null, MEDIA_DIR + "trees_bg.png"); // create background wall object
     
     // Load the tileset image.
@@ -64,23 +64,20 @@ $(document).ready(function ()
     keyhandler.register("Escape");
 
     // Tile:
-    //     x, y,
-    //     w, h,
-    //     framelist,
-    //     xoffset, yoffset,
-    //     img
     var tileset_element = getTileByName("LADDER");
     tile1 = addTile(500, 500, tileset_element);
 
-    layers.push(new Layer(  1)); // 1 is the default speed multiplier
-    layers.push(new Layer(0.5)); // move 0.5 times as fast as the foreground
-    layers.push(new Layer(0.3)); // move 0.3 times as fast as the foreground
+    createLayer(1  , "foreground1"); // 1 is the default speed multiplier
+    createLayer(0.5, "background1"); // move 0.5 times as fast as the foreground
+    createLayer(0.3, "background2"); // move 0.3 times as fast as the foreground
 
     // Put the objects in their desired layers
-    layers[LAYER_ENUM.FOREGROUND1].push(player);
-    layers[LAYER_ENUM.FOREGROUND1].push(tile1);
-    layers[LAYER_ENUM.BACKGROUND1].push(background_wall);
-    layers[LAYER_ENUM.BACKGROUND2].push(background_wall2);
+    pushToLayer(player          , "foreground1");
+    pushToLayer(tile1           , "foreground1");
+
+    pushToLayer(background_wall , "background1");
+    
+    pushToLayer(background_wall2, "background2");
 
     // slowest layers are drawn first so I sort in ascending order by layer speed
     layers.sort(function(a, b)
@@ -88,31 +85,19 @@ $(document).ready(function ()
         return a.speed - b.speed;
     });
 
-    /*
-    ui_fps_label = new UI_Label("test", 50, 50, 100, 100);
-    ui_fps_label.update = function()
-    {
-        this.setText(round_to(player.pos.x, 2));
-    }
-    ui_component_list.push(ui_fps_label);
-    */
     initialize_edit_mode_tiles();
 
     ui_canvas.addEventListener('mousedown', function (event)
     {
-        console.log('clickity clockity');
-        mdown = true;
-        mousestartpos = getMousePos(event);
-        mousepos = mousestartpos;
+        ui_mouse_down(event);
     });
     ui_canvas.addEventListener('mousemove', function (event)
     {
-        mousepos = getMousePos(event);
+        ui_mouse_move(event);
     });
     ui_canvas.addEventListener('mouseup', function (event)
     {
-        mdown = false;
-        mousepos = getMousePos(event);
+        ui_mouse_up(event);
     });
 
     CanvasPlatformer();

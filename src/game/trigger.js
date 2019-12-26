@@ -22,7 +22,7 @@ class Trigger extends Entity
         if(!this.invisible)
         {
             game_ctx.fillStyle = this.color;
-            game_ctx.fillRect(this.pos.x, this.pos.y, this.w, this.h);
+            game_ctx.fillRect(this.pos.x, this.pos.y, this.width, this.height);
         }
         else
             super.draw();

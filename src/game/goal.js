@@ -14,7 +14,7 @@ class Goal extends Trigger
         super(x, y, w, h, color, "materials/basket.png", [0]);
         this.leftRim  = addWall(x, y);
         this.scorelimit = 5;
-        this.rightRim = addWall(x + this.w - 4, y);
+        this.rightRim = addWall(x + this.width - 4, y);
         this.isColliding = false;
         this.invisible = true;
     }
@@ -32,7 +32,9 @@ class Goal extends Trigger
                     var scrbrd = getScoreBoard();
                     var p = pucks[i];
                     for (var x = 0; x < 10; x++)
-                        addParticle(this.pos.x + this.w/2, this.pos.y + this.h/2, Math.random());
+                    {
+                        addParticle(this.pos.x + this.width/2, this.pos.y + this.height/2, Math.random());
+                    }
                     var myself = this;
                     setTimeout(function()
                     {
@@ -40,14 +42,18 @@ class Goal extends Trigger
                         p.killSelf();
                     }, 125);
                     if (scrbrd != null)
+                    {
                         scrbrd.playerScored();
+                    }
                     this.isColliding = true;
                 }                
                 pucks[i].pos.x+=pucks[i].vel.x;
                 pucks[i].pos.y+=pucks[i].vel.y;
             }
             else
+            {
                 this.isColliding = false;
+            }
         }
     }
     setScoreLimit(limit)
@@ -56,10 +62,10 @@ class Goal extends Trigger
     }
     randomizePosition()
     {
-        var xp = getRandomNumber(game_canvas.width/2 + this.w * 2, game_canvas.width  - 2 * this.w);
-        var yp = getRandomNumber(this.h * 2, game_canvas.height - 2 * this.h);
+        var xp = getRandomNumber(game_canvas.width/2 + this.width * 2, game_canvas.width  - 2 * this.width);
+        var yp = getRandomNumber(this.height * 2, game_canvas.height - 2 * this.height);
         this.pos          = {x: xp             , y: yp};
         this.leftRim.pos  = {x: xp             , y: yp};
-        this.rightRim.pos = {x: xp + this.w - 4, y: yp};
+        this.rightRim.pos = {x: xp + this.width - 4, y: yp};
     }
 }

@@ -1,0 +1,2 @@
+Add functionality to the scroll component so that selected elements within
+can be dragged onto the game.

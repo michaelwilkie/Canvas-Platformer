@@ -1,7 +1,7 @@
 **** This is being scrapped                                 ****
 **** It might as well have been another UI_Component class  ****
 **** I'll just make subclasses of UI_Component              ****
-**** Not every thing needs to be absolutely as generic as   ****
+**** Not everything needs to be absolutely as generic as    ****
 ****    possible                                            ****
 
 Add a basic window layout component

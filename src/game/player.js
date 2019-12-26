@@ -28,10 +28,10 @@ class Player extends Entity
         };
 
         this.Animations = new AnimationHandler();
-        this.Animations.addAnimation( null  , 2, this.w, this.h, this.PlayerAnimation["idle"         ] , [0]              );
-        this.Animations.addAnimation("Space", 0, this.w, this.h, this.PlayerAnimation["jumping"      ] , [1,2,3,4,5,6,7,8]);
-        this.Animations.addAnimation("Right", 1, this.w, this.h, this.PlayerAnimation["running_right"] , [1,2,3,4,5,6,7,8]);
-        this.Animations.addAnimation("Left" , 1, this.w, this.h, this.PlayerAnimation["running_left" ] , [8,7,6,5,4,3,2,1]);
+        this.Animations.addAnimation( null  , 2, this.width, this.height, this.PlayerAnimation["idle"         ] , [0]              );
+        this.Animations.addAnimation("Space", 0, this.width, this.height, this.PlayerAnimation["jumping"      ] , [1,2,3,4,5,6,7,8]);
+        this.Animations.addAnimation("Right", 1, this.width, this.height, this.PlayerAnimation["running_right"] , [1,2,3,4,5,6,7,8]);
+        this.Animations.addAnimation("Left" , 1, this.width, this.height, this.PlayerAnimation["running_left" ] , [8,7,6,5,4,3,2,1]);
 
         this.currentAnimation = this.Animations.getAnimationByAction(null);  // This will give the idle animation
 
@@ -101,7 +101,7 @@ class Player extends Entity
         
         if (this.yCollide)
         {
-            this.pos.y = level.height - this.h;
+            this.pos.y = level.height - this.height;
             this.land();
         }
     }

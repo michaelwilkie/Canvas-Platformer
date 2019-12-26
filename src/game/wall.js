@@ -42,7 +42,7 @@ class MovingWall extends Wall
     {
         if (this.moveVertically)
         {
-            if (this.pos.y + this.h/2 < game_canvas.height/2)
+            if (this.pos.y + this.height/2 < game_canvas.height/2)
             {
                 this.vel.y += this.speed;
                 this.vel.y = clamp(this.maxvel, this.vel.y);
@@ -55,7 +55,7 @@ class MovingWall extends Wall
         }
         else
         {
-            if (this.pos.x + this.w/2 < game_canvas.width/2)
+            if (this.pos.x + this.width/2 < game_canvas.width/2)
             {
                 this.vel.x += this.speed;
                 this.vel.x = clamp(this.maxvel, this.vel.x);

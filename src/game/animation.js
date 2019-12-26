@@ -12,8 +12,8 @@ class Animation
     {
         this.width              = width             ; // width  of each animation in pixels (for a canvas with 1:1 zoom)
         this.height             = height            ; // height of each animation in pixels (for a canvas with 1:1 zoom)
-        this.framelist          = framelist         ; // sequences of frames in an animation to show
-        this.animation_index    = animation_index   ; // integer indicating which row will be animated
+        this.framelist          = framelist         ; // sequences of frames (array) in an animation to be shown
+        this.animation_index    = animation_index   ; // integer indicating which row (in a sprite table) will be animated
         this.frame              = 0                 ; // the current frame to be shown
         this.animfinished       = false             ; // boolean determining whether the animation has finished
         this.animation_rate     = 2                 ; // the number of pseudoframes per actual frame

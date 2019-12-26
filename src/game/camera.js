@@ -32,8 +32,8 @@ class Camera
     setZoom(zoomx, zoomy)
     {
         game_ctx.scale(zoomx, zoomy);
-        this.zoomx = zoomx;
-        this.zoomy = zoomy;
+        this.zoomx *= zoomx;
+        this.zoomy *= zoomy;
     }
     moveUp   () { this.y -= this.dy; }
     moveDown () { this.y += this.dy; }
@@ -52,7 +52,7 @@ class Camera
         // +---------------------canvas.width----------------------+    
         // | camera.x, camera.y                x zoom factor: zoomx|
         // |                                   y zoom factor: zoomy|
-        // |   +-----canvas.w / zoomx--------+                     |
+        // |   +----canvas.width / zoomx-----+                     |
         // |   |                             |                     |
         // |   |                             |                     |
         // |   |      player.x,player.y      |canvas.height / zoomy|   canvas.height
@@ -67,8 +67,8 @@ class Camera
         // Follow the player only if it's not in Edit mode.
         if (!bEditMode && this.followme != null)
         {
-            this.x = (this.followme.pos.x + this.followme.w / 2) - this.width  / 2;
-            this.y = (this.followme.pos.y + this.followme.h / 2) - this.height / 2;
+            this.x = (this.followme.pos.x + this.followme.width  / 2) - this.width  / 2;
+            this.y = (this.followme.pos.y + this.followme.height / 2) - this.height / 2;
         }
 
         // Keep the camera within bounds

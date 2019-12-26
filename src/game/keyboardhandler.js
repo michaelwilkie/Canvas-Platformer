@@ -12,8 +12,8 @@
 // +------------------+------------+------------+-------------------------------------+ //
 // |     register     |  function  |    none    |         Adds key to keylist         | //
 // +------------------+------------+------------+-------------------------------------+ //
-// |                  |            |            |  Determines which key is pressed    | //
-// |      keydown     |  function  |    none    |  and sets isPressed to true         | //
+// |                  |            |            |   Determines which key is pressed   | //
+// |      keydown     |  function  |    none    |   and sets isPressed to true        | //
 // |                  |            |            |                                     | //
 // +------------------+------------+------------+-------------------------------------+ //
 // |                  |            |            |   Determines which key is pressed   | //
@@ -73,7 +73,7 @@ class KeyHandler
     keyup(keycode)
     {
         var key;
-        if (Number(keycode) == NaN)
+        if (isNaN(keycode))
         {
             key = this.getKeybyName(keycode);
             if (DEBUG_MODE) console.log("pressed: " + key.name + " " + key.isPressed);
@@ -93,7 +93,7 @@ class KeyHandler
     keydown(keycode)
     {
         var key;
-        if (Number(keycode) == NaN)
+        if (isNaN(keycode))
         {
             key = this.getKeybyName(keycode);
             if (DEBUG_MODE) console.log("unpressed: " + key.name + " " + key.isPressed);

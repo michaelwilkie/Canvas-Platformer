@@ -1,0 +1,12 @@
+Currently, the edit mode component has everything laid out it a single-array manner:
+
+|  1  |  2  |  3  |  4  |  5  |  6  |  7  |  8  |  9  |
+|  10 |  11 |  12 |  13 |  14 |  15 |  16 |  17 |  18 |
+|  19 |  20 |
+
+But I want related tiles to be next to each other:
+
+
+| 1 |           |  3  |
+| 2 |      | 16 |  17 |  19 |
+                |  5  |

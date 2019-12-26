@@ -12,8 +12,8 @@ function game()
         imagesLoaded = allImagesLoaded();
         // allImagesLoaded() sets the level object's height and width
         // I am setting it again here to override it with these other background images.
-        level.setWidth (background_wall.w);
-        level.setHeight(background_wall.h);
+        level.setWidth (background_wall.width);
+        level.setHeight(background_wall.height);
     }
     else
     {
@@ -39,9 +39,15 @@ function game()
             if (keyhandler.isDown("Down" )) { playercamera.moveDown (); }
             if (keyhandler.isDown("Left" )) { playercamera.moveLeft (); }
             if (keyhandler.isDown("Right")) { playercamera.moveRight(); }
+
             for (var i = 0; i < layers.length; i++)
             {
                 layers[i].draw(playercamera);
+            }
+
+            if (mouseselectedentity != null)
+            {
+                mouseselectedentity.draw(playercamera);
             }
         }
         keyhandler.updateLastKeypress();
@@ -49,6 +55,75 @@ function game()
         gameglobals.time++;
     }        
 }
+///////////////////////////////////////////////////
+//                   createLayer                 //
+// Function:                                     //
+//     Creates a Layer object and pushes it onto //
+//     the layers array.                         //
+// Return value:                                 //
+//     Layer object                              //
+///////////////////////////////////////////////////
+function createLayer(layerspeed, layername)
+{
+    var obj = new Layer(layerspeed);
+    obj.name = layername;
+    layers.push(obj);
+    return obj;
+}
+/////////////////////////////////////////////////////
+//                  pushToLayer                    //
+// Function:                                       //
+//     Searches the layers array for a layer whose //
+//     .name property matches 'layername'          //
+// Return value:                                   //
+//     None                                        //
+// Throws:                                         //
+//     "Could not find 'layername'"                //
+/////////////////////////////////////////////////////
+function pushToLayer(ent, layername)
+{
+    var bFoundObject = false;
+    layers.forEach(function(layer_obj)
+    {
+        if (layer_obj.name == layername)
+        {
+            bFoundObject = true;
+
+            layer_obj.push(ent);
+            return;
+        }
+    });
+    if (!bFoundObject)
+    {
+        throw "Could not find layer '" + layername + "'";
+    }
+    return;
+}
+//////////////////////////////////////////////////
+//                getTileByName                 //
+// Function:                                    //
+//     Searches tileset array and returns the   //
+//     element with the matching .name property //
+//                                              //
+//     null is returned otherwise               //
+// Return value:                                //
+//     Tileset element                          //
+//     {name: x: y: w: h:}                      //
+//////////////////////////////////////////////////
+function getTileByName(name)
+{
+    var return_value = null;
+    for (var i = 0; i < tileset.length; i++)
+    {
+        if (tileset[i].name == name)
+        {
+            return_value = tileset[i];
+            break;
+        }
+    }
+    return return_value;
+}
+
 /////////////////////////////////////////////////
 //               getRandomNumber               //
 // Function:                                   //
@@ -335,10 +410,10 @@ function checkSide(a, b)
     if (!(b instanceof Entity))
         return SideEnum.ERROR;
     
-    if (a.pos.x + a.w > b.pos.x + b.w && a.pos.x > b.pos.x + b.w) return SideEnum.LEFT ;
-    if (b.pos.x + b.w > a.pos.x + a.w && b.pos.x > a.pos.x + a.w) return SideEnum.RIGHT;
-    if (a.pos.y + a.h > b.pos.y + b.h && a.pos.y > b.pos.y + b.h) return SideEnum.DOWN ;
-    if (b.pos.y + b.h > a.pos.y + a.h && b.pos.y > a.pos.y + a.h) return SideEnum.UP   ;
+    if (a.pos.x + a.width > b.pos.x + b.width && a.pos.x > b.pos.x + b.width) return SideEnum.LEFT ;
+    if (b.pos.x + b.width > a.pos.x + a.width && b.pos.x > a.pos.x + a.width) return SideEnum.RIGHT;
+    if (a.pos.y + a.height > b.pos.y + b.height && a.pos.y > b.pos.y + b.height) return SideEnum.DOWN ;
+    if (b.pos.y + b.height > a.pos.y + a.height && b.pos.y > a.pos.y + a.height) return SideEnum.UP   ;
     
     return SideEnum.ERROR;
 }
@@ -347,16 +422,38 @@ function checkSide(a, b)
 // Function:                                  //
 //     Returns a boolean value whether or not //
 //     a point is within a rectangle.         //
+//                                            //
+//     Returns false if either parameter is   //
+//     null.                                  //
+//                                            //
+//     Throws exception if either parameters  //
+//     are missing x,y,w or h properties      //
 // Return value:                              //
 //     boolean                                //
 ////////////////////////////////////////////////
 function checkPointCollision(rectangle, point)
 {
+    if (rectangle instanceof Entity)
+    {
+        rectangle.x = rectangle.pos.x;
+        rectangle.y = rectangle.pos.y;
+    }
     if (rectangle == null) return false;
     if (point     == null) return false;
+
+    if (rectangle.x == null || rectangle.y == null) 
+    {
+        throw (rectangle + " missing x or y property");
+    }
+    if (point.x == null || point.y == null) 
+    {
+        throw (point     + " missing x or y property");
+    }
+
+    if (rectangle.width == null || rectangle.height == null) throw (rectangle + " missing width or height property");
     
-    return point.x > rectangle.x && point.x < rectangle.x + rectangle.w
-        && point.y > rectangle.y && point.y < rectangle.y + rectangle.h;
+    return point.x > rectangle.x && point.x < rectangle.x + rectangle.width
+        && point.y > rectangle.y && point.y < rectangle.y + rectangle.height;
 
 }
 ////////////////////////////////////////////////
@@ -374,8 +471,8 @@ function checkCollision(a, b)
     if (!(b instanceof Entity))
         return false;
  
-    var rect1 = {x: a.pos.x, y: a.pos.y, width: a.w, height: a.h}
-    var rect2 = {x: b.pos.x, y: b.pos.y, width: b.w, height: b.h}
+    var rect1 = {x: a.pos.x, y: a.pos.y, width: a.width, height: a.height}
+    var rect2 = {x: b.pos.x, y: b.pos.y, width: b.width, height: b.height}
  
     if (rect1.x < rect2.x + rect2.width &&
         rect1.x + rect1.width > rect2.x &&
@@ -402,7 +499,7 @@ function checkCameraCollision(a, b)
         throw Error("Invalid camera argument, checkCameraCollision recevied " + (typeof a));
     }
     var rect1 = {x: a.x, y: a.y, width: a.width, height: a.height}
-    var rect2 = {x: b.pos.x, y: b.pos.y, width: b.w, height: b.h}
+    var rect2 = {x: b.pos.x, y: b.pos.y, width: b.width, height: b.height}
  
     if (rect1.x <= rect2.x + rect2.width &&
         rect1.x + rect1.width > rect2.x &&
@@ -514,7 +611,18 @@ function addWall(x, y, w, h, imgsrc)
 //////////////////////////////////////////
 function addTile(x, y, tileset_elem)
 {
-    var obj = new Tile(x, y, tileset_elem.w, tileset_elem.h, [0], tileset_elem.x, tileset_elem.y, tileset_img);
+    var obj = new Tile
+    (
+        x,                      // x
+        y,                      // y
+        tileset_elem.width  ,   // width
+        tileset_elem.height ,   // height
+        [0],                    // framelist
+        tileset_elem.x,         // offsetx
+        tileset_elem.y,         // offsety
+        tileset_img,            // img
+        tileset_elem.name       // name
+    );
     entlist.push(obj);
     return obj;
 }
