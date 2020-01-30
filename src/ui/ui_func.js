@@ -22,8 +22,18 @@ function ui()
         ui_component_list[i].update();
     }
 
-    mlastdown = mdown; // putting this here in case I have the game paused so I can still register 'press' vs 'unpress' mouse events
+    mlastdown       = mdown; // putting this here in case I have the game paused so I can still register 'press' vs 'unpress' mouse events
+    mlastwheel      = mwheel;
+    mlastwheeldown  = mwheeldown;
+    mlastwheelup    = mwheelup;
+
+    // These lack a corresponding 'stop wheel' like how mouse has a 'mouseup' to signify user has stopped pressing mouse
+    // so I am setting them to be false here
+    mwheel          = false;
+    mwheeldown      = false;
+    mwheelup        = false;
 }
+
 ////////////////////////////////////////////////////////////
 //                       getFont                          //
 // Function:                                              //
@@ -34,11 +44,12 @@ function ui()
 // Return value:                                          //
 //     string                                             //
 ////////////////////////////////////////////////////////////
-function getFont(font, fontsize)
+function ui_getFont(font, fontsize)
 {
     var base_10 = 10;
     return fontsize.toString(base_10) + "px" + " " + font;
 }
+
 ////////////////////////////////////////////////////////////////
 //                      prepareContext                        //
 // Function:                                                  //
@@ -46,7 +57,7 @@ function getFont(font, fontsize)
 // Return value:                                              //
 //     none                                                   //
 ////////////////////////////////////////////////////////////////
-function prepareContext(font, fontsize, text_color, background_color)
+function ui_prepareContext(font, fontsize, text_color, background_color)
 {
     ui_font             = font            ;
     ui_fontsize         = fontsize        ;
@@ -55,6 +66,7 @@ function prepareContext(font, fontsize, text_color, background_color)
 
     return;
 }
+
 ///////////////////////////////////////////////////////////////////////
 //                           setFillColor                            //
 // Function:                                                         //
@@ -62,7 +74,7 @@ function prepareContext(font, fontsize, text_color, background_color)
 // Return value:                                                     //
 //     none                                                          //
 ///////////////////////////////////////////////////////////////////////
-function setFillColor(color)
+function ui_setFillColor(color)
 {
     ui_ctx.fillStyle = color;
     return;
@@ -75,12 +87,12 @@ function setFillColor(color)
 // Return value:                                                                        //
 //     none                                                                             //
 //////////////////////////////////////////////////////////////////////////////////////////
-function drawText(text, x, y, color, alignment="center", font, fontsize)
+function ui_drawText(text, x, y, color, alignment="center", font, fontsize)
 {
     if (DEBUG_MODE)  console.log(getFont(font, fontsize));
-    ui_ctx.font = getFont(font, fontsize);
-    ui_ctx.fillStyle = color;
-    ui_ctx.textAlign = alignment;
+    ui_ctx.font         = ui_getFont(font, fontsize);
+    ui_ctx.fillStyle    = color;
+    ui_ctx.textAlign    = alignment;
     ui_ctx.fillText(text, x, y);
 
     return;
@@ -93,18 +105,19 @@ function drawText(text, x, y, color, alignment="center", font, fontsize)
 // Return value:                                                     //
 //     none                                                          //
 ///////////////////////////////////////////////////////////////////////
-function drawBox(x, y, w, h, style, lineWidth=2)
+function ui_drawBox(x, y, w, h, style, lineWidth=2)
 {
-    var old_width = ui_ctx.lineWidth;
-    var old_style = ui_ctx.strokeStyle;
-    ui_ctx.strokeStyle = style;
+    var old_width       = ui_ctx.lineWidth;
+    var old_style       = ui_ctx.strokeStyle;
+    ui_ctx.strokeStyle  = style;
+    ui_ctx.lineWidth    = lineWidth;
+
     ui_ctx.beginPath();
-    ui_ctx.rect(x, y, w, h);
-    ui_ctx.lineWidth = lineWidth;
+    ui_ctx.rect(x, y, w, h);    
     ui_ctx.stroke();
 
-    ui_ctx.lineWidth = old_width;
-    ui_ctx.strokeStyle = old_style;
+    ui_ctx.lineWidth    = old_width;
+    ui_ctx.strokeStyle  = old_style;
     return;
 }
 
@@ -134,7 +147,7 @@ function drawBox(x, y, w, h, style, lineWidth=2)
 // Return value:                                                  //
 //     none                                                       //
 ////////////////////////////////////////////////////////////////////
-function invertedClearRect(x, y, w, h)
+function ui_invertedClearRect(x, y, w, h)
 {
     var rect1 = {x: 0    , y: 0    , w: SCREEN_WIDTH          , h: y                       };
     var rect2 = {x: 0    , y: y + h, w: SCREEN_WIDTH          , h: SCREEN_HEIGHT - (y + h) };
@@ -154,7 +167,7 @@ function invertedClearRect(x, y, w, h)
 // Return value:                                                                     //
 //     none                                                                          //
 ///////////////////////////////////////////////////////////////////////////////////////
-function fillBox(x, y, w, h, style)
+function ui_fillBox(x, y, w, h, style)
 {
     ui_ctx.fillStyle = style;
     ui_ctx.fillRect(x, y, w, h);

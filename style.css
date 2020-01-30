@@ -1,0 +1,95 @@
+body, html
+{
+    background-color: black;
+    color: white;
+}
+
+.grid-container 
+{
+    display: grid;
+    grid-template-columns: auto auto 0;
+    grid-template-rows: fit-content(100%);
+    grid-gap: 5px;
+    /*padding: 5px;*/
+    height: 100%;
+}
+
+.grid-container > div 
+{
+    background-color: rgba(58, 57, 57, 0.5);
+    text-align: center;
+    border-radius: 5px;
+    padding: 20px 0;
+}
+
+.col-mode 
+{
+    grid-column-start: 1;
+    grid-column-end: 4;
+    font-size: 30px;
+}
+
+.col-tileset
+{
+	grid-column-start: 1;
+    width: 158.0%;
+    font-size: 30px;
+}
+
+.col-displayoptions
+{
+	grid-column-start: 2;
+    position: relative;
+    left: 50%;
+    width: 51%;
+    font-size: 20px;
+}
+.row 
+{
+    width  : 100%;
+    margin : 5px             ;
+    border : 2px dotted red;
+    display: flex            ;
+}
+
+.column 
+{
+    border       : 2px dotted yellow;
+    border-radius: 5px                ;
+    margin: 5px                       ;
+}
+
+canvas
+{
+    border: 2px solid black;
+}
+img
+{
+    border: 2px solid black;
+}
+.wrapper 
+{
+    position: relative;
+    width : 1204px;
+    height: 804px;
+}
+
+.wrapper canvas 
+{
+    position: absolute;
+    top : 0;
+    left: 0;
+}
+#col2
+{
+    width: 100%;
+    display: block;
+}
+
+#ui_canvas      { z-index: 2        ; }
+#game_canvas    { z-index: 1        ; }
+
+#div_author
+{
+    font-size: 30px;
+}

@@ -34,7 +34,9 @@ class Puck extends Entity
             if (this.framelist != null)
             {
                 if (this.frame == this.framelist.length - 1)
+                {
                     this.animfinished = true;
+                }
             }
             if (this.updateframe > 10)
             {

@@ -40,6 +40,9 @@ $(document).ready(function ()
 
     player = addPlayer(10, 10);
 
+    SCREEN_WIDTH  = game_canvas.width;
+    SCREEN_HEIGHT = game_canvas.height;
+
     // Set up player camera to follow player
     playercamera = new Camera(player);   
     playercamera.initialize(0, 0, game_canvas.width, game_canvas.height);
@@ -47,8 +50,8 @@ $(document).ready(function ()
 
     // Set level boundaries
     level = new Level();
-    background_wall  = addWall(0, 100, null, null, MEDIA_DIR + "trees_fg.png"); // create background wall object
-    background_wall2 = addWall(0, 0, null, null, MEDIA_DIR + "trees_bg.png"); // create background wall object
+    background_wall  = addWall(0,   0, null, null, MEDIA_DIR + "trees_fg.png"); // create background wall object
+    background_wall2 = addWall(0, 200, null, null, MEDIA_DIR + "trees_bg.png"); // create background wall object
     
     // Load the tileset image.
     tileset_img = new Image();
@@ -56,16 +59,14 @@ $(document).ready(function ()
 
     // Register key bindings
     keyhandler = new KeyHandler();
+    keyhandler.register("`"     );
     keyhandler.register("Up"    );
     keyhandler.register("Down"  );
     keyhandler.register("Left"  );
     keyhandler.register("Right" );
     keyhandler.register("Space" );
     keyhandler.register("Escape");
-
-    // Tile:
-    var tileset_element = getTileByName("LADDER");
-    tile1 = addTile(500, 500, tileset_element);
+    keyhandler.register("Delete");
 
     createLayer(1  , "foreground1"); // 1 is the default speed multiplier
     createLayer(0.5, "background1"); // move 0.5 times as fast as the foreground
@@ -73,10 +74,7 @@ $(document).ready(function ()
 
     // Put the objects in their desired layers
     pushToLayer(player          , "foreground1");
-    pushToLayer(tile1           , "foreground1");
-
-    pushToLayer(background_wall , "background1");
-    
+    pushToLayer(background_wall , "background1");    
     pushToLayer(background_wall2, "background2");
 
     // slowest layers are drawn first so I sort in ascending order by layer speed
@@ -85,7 +83,18 @@ $(document).ready(function ()
         return a.speed - b.speed;
     });
 
+    html_initialize_globals();
+    initialize_edit_mode_component();
     initialize_edit_mode_tiles();
+    initialize_edit_mode_html();
+
+    ui_canvas.addEventListener('wheel', function (event)
+    {
+        ui_mouse_wheel(event);
+    
+        // Returning false so you don't scroll the whole HTML page by accident
+        return false;
+    });
 
     ui_canvas.addEventListener('mousedown', function (event)
     {

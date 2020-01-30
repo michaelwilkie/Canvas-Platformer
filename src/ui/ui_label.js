@@ -12,7 +12,8 @@ class UI_Label extends UI_Component
     font             = ui_default_font, 
     fontsize         = ui_default_fontsize, 
     text_color       = ui_default_text_color, 
-    background_color = ui_default_background_color)
+    background_color = ui_default_background_color,
+    text_alignment   = ui_default_text_alignment)
     {
         super();
         this.text             = text            ;
@@ -24,6 +25,11 @@ class UI_Label extends UI_Component
         this.fontsize         = fontsize        ;
         this.text_color       = text_color      ;
         this.background_color = background_color;
+        this.text_alignment   = text_alignment  ;
+    }
+    getText()
+    {
+        return this.text;
     }
     setText(text)
     {
@@ -31,7 +37,7 @@ class UI_Label extends UI_Component
     }
     draw(xoffset=0, yoffset=0)
     {
-        fillBox
+        ui_fillBox
         (
             this.x + xoffset, 
             this.y + yoffset, 
@@ -40,19 +46,20 @@ class UI_Label extends UI_Component
             this.background_color
         );
         
-        drawText
+        ui_drawText
         (
             this.text, 
             this.x + xoffset, 
             this.y + yoffset, 
             this.text_color, 
-            "center", 
+            this.text_alignment, 
             this.font, 
             this.fontsize
         );
     }
     update()
     {
-        
+        // nothing to do here
+        // defined so no null exceptions are thrown when components are asked to call their update function
     }
 }

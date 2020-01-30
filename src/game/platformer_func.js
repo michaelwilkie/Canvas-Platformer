@@ -19,11 +19,19 @@ function game()
     {
         var bEditMode = gameglobals.mode == GAME_MODE_ENUM.EDIT_MODE;
         var bPlayMode = gameglobals.mode == GAME_MODE_ENUM.PLAY_MODE;
-        if (keyhandler.isPressed("Escape"))
+        if (keyhandler.isPressed("`"))
         {
-            if (DEBUG_MODE) console.log("Escape pressed");
-            if (bPlayMode) { gameglobals.mode = GAME_MODE_ENUM.EDIT_MODE; if (DEBUG_MODE) console.log("Edit mode"); }
-            else           { gameglobals.mode = GAME_MODE_ENUM.PLAY_MODE; if (DEBUG_MODE) console.log("Play mode"); }
+            if (mouseselectedentity == null)
+            {
+                if (DEBUG_MODE) console.log("Key: '~' pressed");
+                if (bPlayMode) { gameglobals.mode = GAME_MODE_ENUM.EDIT_MODE; html_div_edit_mode.innerHTML = "Edit Mode"; if (DEBUG_MODE) console.log("Edit mode"); }
+                else           { gameglobals.mode = GAME_MODE_ENUM.PLAY_MODE; html_div_edit_mode.innerHTML = "Play Mode"; if (DEBUG_MODE) console.log("Play mode"); }
+            }
+            else
+            {
+                mouseselectedentity = null;
+                ui_edit_mode_component.scroll_component.selectedObject = null;
+            }
         }
         if (bPlayMode)
         {
@@ -35,10 +43,7 @@ function game()
         }
         else if (bEditMode)
         {
-            if (keyhandler.isDown("Up"   )) { playercamera.moveUp   (); }
-            if (keyhandler.isDown("Down" )) { playercamera.moveDown (); }
-            if (keyhandler.isDown("Left" )) { playercamera.moveLeft (); }
-            if (keyhandler.isDown("Right")) { playercamera.moveRight(); }
+            handleEditModeControls();
 
             for (var i = 0; i < layers.length; i++)
             {
@@ -53,7 +58,42 @@ function game()
         keyhandler.updateLastKeypress();
         playercamera.update(bEditMode);
         gameglobals.time++;
-    }        
+    }
+}
+////////////////////////////////////////////////////////////
+//                  handleEditModeControls                //
+// Function:                                              //
+//     Contains the code that handles user input specific //
+//     to the edit mode component                         //
+// Return value:                                          //
+//     None                                               //
+////////////////////////////////////////////////////////////
+function handleEditModeControls()
+{
+    if (keyhandler.isPressed("Escape"))
+    {
+        if (mouseselectedentity != null)
+        {
+            html_applyDefaultStyleToImg(html_selectedObject);
+            mouseselectedentity = null;
+            html_selectedObject = null;
+        }
+    }
+
+    if (keyhandler.isDown("Up"    )) { playercamera.moveUp   (); }
+    if (keyhandler.isDown("Down"  )) { playercamera.moveDown (); }
+    if (keyhandler.isDown("Left"  )) { playercamera.moveLeft (); }
+    if (keyhandler.isDown("Right" )) { playercamera.moveRight(); }
+    if (keyhandler.isDown("Delete")) 
+    {
+        if (mouseselectedentity != null)
+        {
+            html_applyDefaultStyleToImg(html_selectedObject);
+            mouseselectedentity.killSelf();
+            mouseselectedentity = null;
+            html_selectedObject = null;
+        }
+    }
 }
 ///////////////////////////////////////////////////
 //                   createLayer                 //
@@ -99,6 +139,27 @@ function pushToLayer(ent, layername)
     }
     return;
 }
+/////////////////////////////////////////////
+//               createImage               //
+// Function:                               //
+//     Creates an image object from imgsrc //
+// Return value:                           //
+//     Image object                        //
+/////////////////////////////////////////////
+function createImageObject(imgsrc)
+{
+    var img_object = null;
+
+    // Images are used for visible entities
+    if (imgsrc != null)
+    {
+        img_object = new Image();
+        img_object.src = imgsrc;
+    }
+
+    return img_object;
+}
+
 //////////////////////////////////////////////////
 //                getTileByName                 //
 // Function:                                    //
@@ -136,6 +197,7 @@ function getRandomNumber(lower, upper)
 {
     return Math.floor((Math.random() * (upper - lower)) + lower);
 }
+
 ////////////////////////////////////////////////////////
 //                  getMousePos                       //
 // Function:                                          //
@@ -154,6 +216,7 @@ function getMousePos(e)
         y: e.clientY - rect.top
     };
 }
+
 ////////////////////////////////////////////////////////
 //                  getTouchPos                       //
 // Function:                                          //
@@ -172,6 +235,7 @@ function getTouchPos(canvasDom, touchEvent)
         y: touchEvent.touches[0].clientY - rect.top
     };
 }
+
 /////////////////////////////////////////////////////////////////////
 //                        copyCanvasData                           //
 // Function:                                                       //
@@ -189,6 +253,7 @@ function copyCanvasData(srcx, srcy, w, h,
     var imgData = ct.getImageData(srcx, srcy, w, h);
     ct.putImageData(imgData, dstx, dsty);
 }
+ //////////////////////
 ////////////////////////////////////////////////////
 //                 getUnitVector                  //
 // Function:                                      //
@@ -204,6 +269,7 @@ function getUnitVector(vect)
     var sqrsum = vect.x * vect.x + vect.y * vect.y;
     return {x: vect.x/sqrsum, y: vect.y/sqrsum};
 }
+
 ////////////////////////////////////////////////////////////
 //                    colorNameToHex                      //
 // Function:                                              //
@@ -219,6 +285,7 @@ function colorNameToHex(color)
 
     return null;
 }
+
 ///////////////////////////////////////////
 //               invertColor             //
 // Function:                             //
@@ -262,6 +329,13 @@ function invertColor(hex, bw)
     // pad each with zeros and return
     return "#" + padZero(r) + padZero(g) + padZero(b);
 }
+function padZero(str, len) 
+{
+    len = len || 2;
+    var zeros = new Array(len).join('0');
+    return (zeros + str).slice(-len);
+}
+
 //////////////////////////////////////////////////////////
 //                      approach                        //
 // Function:                                            //
@@ -271,6 +345,9 @@ function invertColor(hex, bw)
 //     else it approaches flgoal another step.          //
 // Return value:                                        //
 //     Float                                            //
+// Source:                                              //
+// This function was on youtube, but I don't remember   //
+// the title.                                           //
 //////////////////////////////////////////////////////////
 function approach(flgoal, flcurrent, fldelta)
 {
@@ -281,6 +358,7 @@ function approach(flgoal, flcurrent, fldelta)
 
 	return flgoal;
 }
+
 /////////////////////////////////////////////////
 //                   clamp                     //
 // Function:                                   //
@@ -299,6 +377,7 @@ function clamp(clmp, curr)
         return Math.min(clmp, curr);
     }
 }
+
 /////////////////////////////////////////////////////
 //                  getPlayer                      //
 // Function:                                       //
@@ -314,6 +393,7 @@ function getPlayer()
             return entlist[i];
     return null;
 }
+
 /////////////////////////////////////////////////////
 //             getPlayer (*deprecated*)            //
 // Function:                                       //
@@ -329,6 +409,7 @@ function getPuck()
             return entlist[i];
     return null;
 }
+
 ////////////////////////////////////
 // getScoreBoard (*deprecated*)   //
 // Function:                      //
@@ -340,6 +421,7 @@ function getScoreBoard()
 {
     return scorebrd;
 }
+
 ////////////////////////////////////////////////////////////////////
 //                      allImagesLoaded                           //
 // Function:                                                      //
@@ -358,6 +440,7 @@ function allImagesLoaded()
                 return false;
     return true;
 }
+
 //////////////////////////////////////////////////
 //                  SideEnum                    //
 // Enumerator:                                  //
@@ -373,6 +456,7 @@ var SideEnum = {
     LEFT : 3,
     ERROR: 4
 }
+
 ///////////////////////////////////////////
 //              SideString               //
 // String array:                         //
@@ -388,6 +472,7 @@ var SideString = [
     "left",
     "error"
 ];
+
 ////////////////////////////////////////////////////////////////
 // checkSide(a,b) :  return what side entity A is to entity B //
 //                                                            //
@@ -410,13 +495,14 @@ function checkSide(a, b)
     if (!(b instanceof Entity))
         return SideEnum.ERROR;
     
-    if (a.pos.x + a.width > b.pos.x + b.width && a.pos.x > b.pos.x + b.width) return SideEnum.LEFT ;
-    if (b.pos.x + b.width > a.pos.x + a.width && b.pos.x > a.pos.x + a.width) return SideEnum.RIGHT;
+    if (a.pos.x + a.width > b.pos.x  + b.width  && a.pos.x > b.pos.x + b.width ) return SideEnum.LEFT ;
+    if (b.pos.x + b.width > a.pos.x  + a.width  && b.pos.x > a.pos.x + a.width ) return SideEnum.RIGHT;
     if (a.pos.y + a.height > b.pos.y + b.height && a.pos.y > b.pos.y + b.height) return SideEnum.DOWN ;
     if (b.pos.y + b.height > a.pos.y + a.height && b.pos.y > a.pos.y + a.height) return SideEnum.UP   ;
     
     return SideEnum.ERROR;
 }
+
 ////////////////////////////////////////////////
 //             checkPointCollision            //
 // Function:                                  //
@@ -454,8 +540,8 @@ function checkPointCollision(rectangle, point)
     
     return point.x > rectangle.x && point.x < rectangle.x + rectangle.width
         && point.y > rectangle.y && point.y < rectangle.y + rectangle.height;
-
 }
+
 ////////////////////////////////////////////////
 //             checkCollision                 //
 // Function:                                  //
@@ -483,6 +569,7 @@ function checkCollision(a, b)
     }
     return false;   
 }
+
 //////////////////////////////////////////////////////////////////////////////////////
 //                             checkCameraCollision                                 //
 // Function:                                                                        //
@@ -500,16 +587,17 @@ function checkCameraCollision(a, b)
     }
     var rect1 = {x: a.x, y: a.y, width: a.width, height: a.height}
     var rect2 = {x: b.pos.x, y: b.pos.y, width: b.width, height: b.height}
- 
-    if (rect1.x <= rect2.x + rect2.width &&
-        rect1.x + rect1.width > rect2.x &&
-        rect1.y <= rect2.y + rect2.height &&
-        rect1.y + rect1.height > rect2.y)
+
+    if (rect1.x                 <= rect2.x + rect2.width    &&
+        rect1.x + rect1.width   >  rect2.x                  &&
+        rect1.y                 <= rect2.y + rect2.height   &&
+        rect1.y + rect1.height  >  rect2.y)
     {
         return true;
     }
     return false;   
 }
+
 ////////////////////////////////////////////////
 //      checkPuckCollision (*deprecated*)     //
 // Function:                                  //
@@ -530,6 +618,7 @@ function checkPuckCollision(a, b)
                             );
     return distance < a.radius + b.radius;
 }
+
 ////////////////////////////////////////////////////
 //          addPuckAtMouse (*deprecated*)         //
 // Function:                                      //
@@ -545,6 +634,7 @@ function addPuckAtMouse(e)
     var vy = (mousestartpos.y - mousepos.y) / 10;
     addPuck(x - 16, y - 16, vx, vy);
 }
+
 /////////////////////////////////////////////////////////
 //                     addParticle                     //
 // Function:                                           //
@@ -559,6 +649,7 @@ function addParticle(x, y, scale)
     entlist.push(obj);
     return obj;
 }
+
 /////////////////////////////////////////////////////
 //             addParticle (*deprecated*)          //
 // Function:                                       //
@@ -573,6 +664,7 @@ function addPuck(x, y, vx, vy)
     entlist.push(obj);
     return obj;
 }
+
 ////////////////////////////////////////////////////////////
 //                 addGoal (*deprecated*)                 //
 // Function:                                              //
@@ -587,6 +679,7 @@ function addGoal(x, y, w, h)
     entlist.push(obj);
     return obj;
 }
+
 ////////////////////////////////////////////////////////////
 //                       addWall                          //
 // Function:                                              //
@@ -601,6 +694,7 @@ function addWall(x, y, w, h, imgsrc)
     entlist.push(obj);
     return obj;
 }
+
 //////////////////////////////////////////
 //              addTile                 //
 // Function:                            //
@@ -626,6 +720,7 @@ function addTile(x, y, tileset_elem)
     entlist.push(obj);
     return obj;
 }
+
 /////////////////////////////////////////////////////////////
 //               addMovingWall (*deprecated*)              //
 // Function:                                               //
@@ -641,6 +736,7 @@ function addMovingWall(x, y, isVertical)
     entlist.push(obj);
     return obj;
 }
+
 /////////////////////////////////////////////////////////////
 //                       addPlayer                         //
 // Function:                                               //
@@ -654,6 +750,7 @@ function addPlayer(x, y)
     entlist.push(obj);
     return obj;
 }
+
 ///////////////////////////////////////////////////////////
 //                sound (*deprecated*)                   //
 // Function:                                             //
@@ -676,6 +773,7 @@ function sound(src)
         this.sound.pause();
     }    
 }
+
 //////////////////////////////////////////////
 //                drawLine                  //
 // Function:                                //
@@ -690,6 +788,7 @@ function drawLine()
     game_ctx.lineTo(mousepos.x, mousepos.y);
     game_ctx.stroke();
 }
+
 ///////////////////////////////////////////////////////
 //                    distance                       //
 // Function:                                         //
@@ -705,6 +804,7 @@ function distance(p1, p2)
     var y = p2.y - p1.y;
     return Math.sqrt(x*x + y*y);
 }
+
 /////////////////////////////////////////////////////////////////////////////////////////////////
 //                                          round_to                                           //
 // Function:                                                                                   //

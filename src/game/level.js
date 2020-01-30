@@ -33,7 +33,7 @@ class Level
         }
         else
         {
-            this.width = 10000;
+            this.width  = 10000;
             this.height = 10000;
         }
     }

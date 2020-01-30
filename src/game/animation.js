@@ -19,6 +19,7 @@ class Animation
         this.animation_rate     = 2                 ; // the number of pseudoframes per actual frame
         this.updateframe        = 0                 ; // to help slow down the rate of an animation
     }
+    
     /////////////////////////////////////////////////
     //              setAnimationRate               //
     // Function:                                   //
@@ -32,6 +33,7 @@ class Animation
     {
         this.animation_rate = animation_rate;
     }
+
     /////////////////////////////////////////////////////////////////////
     //                            rewind                               //
     // Function:                                                       //
@@ -45,6 +47,7 @@ class Animation
         this.animfinished = false;
         this.frame = this.framelist[0];
     }
+
     ////////////////////////////////////////////////////////////////////
     //                            update                              //
     // Function:                                                      //

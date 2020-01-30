@@ -34,55 +34,82 @@ class Entity
 {
     constructor(x, y, w, h, imgsrc, framelist, layer=0)
     {
-        this.pos      = {x:  x, y:  y};
-        this.vel      = {x:  0, y:  0};
-        this.acc      = {x:  0, y:  0};
-        this.gravity  = {x:  0, y:  0};
-        this.friction = {x:  0, y:  0};
-        this.maxvel   = {x: 10, y: 10};
-        this.angle = 0;
-        this.anglerate = 0;
-        this.scale = 1;
-        this.width = w;
-        this.height = h;
-        this.noCollide = false;
-        this.xCollide = false;
-        this.yCollide = false;
-        this.isVisible = true;
-        this.layer = layer;
-        // Images are used for visible entities
-        if (imgsrc != null)
+        this.pos            = {x:  x, y:  y};
+        this.vel            = {x:  0, y:  0};
+        this.acc            = {x:  0, y:  0};
+        this.gravity        = {x:  0, y:  0};
+        this.friction       = {x:  0, y:  0};
+        this.maxvel         = {x: 10, y: 10};
+
+        this.angle          = 0;
+        this.anglerate      = 0;
+
+        this.scale          = 1;
+
+        this.width          = w;
+        this.height         = h;
+
+        this.noCollide      = false;
+        this.xCollide       = false;
+        this.yCollide       = false;
+
+        this.isVisible      = true;
+
+        this.layer          = layer;
+
+        this.img            = createImageObject(imgsrc); 
+
+        var temp = this;
+        if (this.img != null)
         {
-            this.img = new Image();
-            this.img.src = imgsrc;
-            if (this.width == null || this.height == null)
+            this.img.onload = function()
             {
-                var wall = this;
-                this.img.onload = function()
+                if (temp.width == null || temp.height == null)
                 {
-                    wall.width = this.width;
-                    wall.height = this.height;
-                };
+                    temp.width = this.width;
+                    temp.height = this.height;
+                }
             }
         }
-        this.frame = 0;
-        this.framerow = 0;
-        this.framelist = framelist;
-        this.updateframe = 0;
-        this.animfinished = false;
-        this.framecooldown = 10;
+
+        this.frame          = 0         ;
+        this.framerow       = 0         ;
+        this.framelist      = framelist ;
+        this.updateframe    = 0         ;
+        this.animfinished   = false     ;
+        this.framecooldown  = 10        ;
     }
     setMaxVelocity(x, y) { this.maxvel.x   = x; this.maxvel.y   = y; }
     setVelocity   (x, y) { this.vel.x      = x; this.vel.y      = y; }
     setGravity    (x, y) { this.gravity.x  = x; this.gravity.y  = y; }
     setFriction   (x, y) { this.friction.x = x; this.friction.y = y; }
-    setVisible    (    ) { this.isVisible = true ;                   }
-    setInvisible  (    ) { this.isVisible = false;                   }
+    setVisible    (    ) { this.isVisible  = true ;                  }
+    setInvisible  (    ) { this.isVisible  = false;                  }
+    
     killSelf()
     {
+        // remove from global entlist
         for (var i = 0; i < entlist.length; i++)
+        {
             if (entlist[i] == this)
+            {
                 entlist.splice(i, 1);
+            }
+        }
+
+        // remove from layer list
+        for (var i = 0; i < layers.length; i++)
+        {
+            var layerobject = layers[i];
+            for (var j = 0; j < layerobject.entlist.length; j++)
+            {
+                var elem = layerobject.entlist[j];
+                if (elem == this)
+                {
+                    layerobject.entlist.splice(i, 1);
+                }
+            }
+        }
     }
     draw(camera, layerspeed=1, width=null, height=null)
     {        
@@ -153,6 +180,16 @@ class Entity
 
         this.keepInBounds();
     }
+
+    ///////////////////////////////////////////////////////
+    //                  keepInBounds                     //
+    // Function:                                         //
+    //     Keeps an object in bounds unless it is a Wall //
+    //     It was probably put out of bounds on purpose  //
+    //     since it can't move by itself                 //
+    // Return value:                                     //
+    //     None                                          //
+    ///////////////////////////////////////////////////////
     keepInBounds()
     {
         if (this instanceof Wall)
