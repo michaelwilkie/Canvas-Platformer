@@ -1,18 +1,18 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <link   rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
-        <link   rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
+        <link rel="stylesheet" href="css/w3.css"></link>
+        <script src="src/jquery.min.js"></script>
         <title>Canvas Platformer</title>
-
-        <link href="style.css" rel="stylesheet" type="text/css"></link>
+        <link href="css/style.css" rel="stylesheet" type="text/css"></link>
+        <!--<link href="css/font-awesome.min.css" rel="stylesheet"></link>-->
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet"></link>
+        
 
     </head>
 
-    <body>
-        <script src="src/game/platformer_func.js"   ></script> <!-- Game loop and other useful functions -->
+    <body oncontextmenu="return false;">
+        <script src="src/game/game_func.js"         ></script> <!-- Game loop and other useful functions -->
         <script src="src/game/animationhandler.js"  ></script> <!-- Animation list operation handling    -->
         <script src="src/game/animation.js"         ></script> <!-- Sprite animation handling            -->
         <script src="src/game/tileset_info.js"      ></script> <!-- Tileset table                        -->
@@ -21,7 +21,7 @@
         <script src="src/game/camera.js"            ></script> <!-- Camera object class                  -->
         <script src="src/game/key.js"               ></script> <!-- Key class                            -->
         <script src="src/game/keyboardhandler.js"   ></script> <!-- Keyboard Input Handling              -->
-        <script src="src/game/platformer_globals.js"></script> <!-- Global variable definitions          -->
+        <script src="src/game/game_globals.js"      ></script> <!-- Global variable definitions          -->
         <script src="src/game/tables.js"            ></script> <!-- Global variables of large tables     -->
         <script src="src/game/entity.js"            ></script> <!-- Base class for almost all objects    -->
         <script src="src/game/player.js"            ></script> <!-- Basic player class                   -->
@@ -70,12 +70,33 @@
 
             <!-- Column 2 Edit Mode / Miscellaneous controls -->
             <div id="col2" class="column">
-                <div class="grid-container">
-                    <div id="div_editmode"       class="col-mode">Play Mode        </div>
-                    <div id="div_tileset"        class="col-tileset">Tileset          </div>
-                    <div id="div_displayoptions" class="col-displayoptions">Display Options  </div>
+                <div class="row">
+                    <div id="div_edit_mode" class="col-mode" onclick="game_transitionMode()">Play Mode</div>
                 </div>
-            </div>
+                <!-- Column 2 Edit Mode - Row 1 -->
+                <div class="row">
+                    <div id="div_tileset"   class="column gray-area col-tileset">
+                        <div id="div_tileset_label" >Tileset</div> 
+                    </div>
+                    
+                    <!-- Column 2 Edit Mode - Row 2 -->
+                    <div id="div_displayoptions" class="column gray-area col-displayoptions">
+                        <div id="div_displayoptions_label">Display Options</div>
+                        <div id="div_layers">
+                            Layers
+                            <i class="fa fa-plus-circle" onclick="html_addLayerElement()"></i>
+                        </div>
+                        <div id="div_layers_scrollarea">
+                            <!--<span class="layer-element">
+                                <i class="fa fa-plus-circle"></i>
+                                <i class="fa fa-minus-circle"></i>
+                                <input type="text" class="layer-element" value="Default Layer"></input>
+                            </span>-->
+                        </div> <!-- <div id="div_layers_scrollarea"> -->
+                    </div> <!-- <div id="div_displayoptions"> -->
+                    <div id="div_other" class="gray-area col-other"></div>
+                </div> <!-- <div class="row"> -->
+            </div><!-- <div class="col2"> -->
         </div>
 
         <!-- Row 2 -->

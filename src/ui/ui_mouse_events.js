@@ -26,10 +26,32 @@ function ui_mouse_wheel(event)
 function ui_mouse_down(event)
 {
     console.log('clickity clockity');
-    mdown = true;
+
+    switch(event.which)
+    {
+        case 1:
+        {
+            // left click
+            mdownleft = true;
+            console.log("leftity clickity");
+            break;
+        }
+        case 2:
+        {
+            // middle click
+            break;
+        }
+        case 3:
+        {
+            // right click
+            mdownright = true;
+            console.log("rightity clockity");
+            break;
+        }
+    }
     mousestartpos = getMousePos(event);
     mousepos = mousestartpos;
-    
+
     if (gameglobals.mode == GAME_MODE_ENUM.EDIT_MODE)
     {
         ///////////////////////////////////////////////////////////////////
@@ -37,12 +59,19 @@ function ui_mouse_down(event)
         ///////////////////////////////////////////////////////////////////
         if (html_selectedObject != null)
         {
-            pushToLayer
-            (
-                mouseselectedentity,    // entity
-                "foreground1"           // layer name
-            );
-            mouseselectedentity = addTile(mouseselectedentity.pos.x, mouseselectedentity.pos.y, getTileByName(mouseselectedentity.name));
+            if (mdownleft)
+            {
+                pushToLayer
+                (
+                    mouseselectedentity,    // entity
+                    "foreground1"           // layer name
+                );
+                mouseselectedentity = addTile(mouseselectedentity.pos.x, mouseselectedentity.pos.y, getTileByName(mouseselectedentity.name));
+            }
+            else
+            {
+                game_unselectObject();
+            }
         }
         /////////////////////////////////////////
         // A tile from game canvas is selected //
@@ -84,11 +113,18 @@ function ui_mouse_down(event)
                     ////////////////////////////////////////////
                     // TO DO:                                 //
                     // Add per layer click drag functionality //
-                    ////////////////////////////////////////////                        
+                    ////////////////////////////////////////////
                     if (entlist[i] instanceof Tile 
                     && checkPointCollision(entlist[i], scaled_mouse_position))
                     {
-                        mouseselectedentity = entlist[i];
+                        if (mdownleft)
+                        {
+                            mouseselectedentity = entlist[i];
+                        }
+                        else if (mdownright)
+                        {
+                            game_unselectObject();
+                        }
                         break;
                     }
                 }
@@ -98,17 +134,23 @@ function ui_mouse_down(event)
             ///////////////////////////////////////
             else
             {
-                mouseselectedentity.pos = truncated_mousepos;
-                mouseselectedentity = null;
-                if (html_selectedObject != null)
+                if (mdownleft)
                 {
+                    mouseselectedentity.pos = truncated_mousepos;
+                    mouseselectedentity = null;
                     html_applyDefaultStyleToImg(html_selectedObject);
                     html_selectedObject = null;
                 }
-            }
-        }
+                else if (mdownright)
+                {
+                    game_unselectObject();
+                }
 
-    }
+            }
+        } // end if (html_selectedObject != null) else { }
+
+    } // end if (gameglobals.mode == GAME_MODE_ENUM.EDIT_MODE)
+
 }
 
 function ui_mouse_move(event)
@@ -180,7 +222,7 @@ function ui_mouse_move(event)
 
             mouseselectedentity.pos.x = new_x;
             mouseselectedentity.pos.y = new_y;
-            if (mdown)
+            if (mdownleft)
             {
                 if (new_x != ui_mouse_events_previous_new_x
                  || new_y != ui_mouse_events_previous_new_y)
@@ -196,17 +238,37 @@ function ui_mouse_move(event)
 
             ui_mouse_events_previous_new_x = new_x;
             ui_mouse_events_previous_new_y = new_y;
-        }
+        } // end if (mouseselectedentity != null)
         else
         {
             mousedragbox = {x: mousestartpos.x -  playercamera.x , y: mousestartpos.y - playercamera.y,
                             w: mousepos.x      -  mousestartpos.x, h: mousepos.y      - mousestartpos.y};
         }
-    }
+    } // end if (gameglobals.mode == GAME_MODE_ENUM.EDIT_MODE)
 }
 
 function ui_mouse_up(event)
 {
-    mdown = false;
+    switch(event.which)
+    {
+        case 1:
+        {
+            // left click
+            mdownleft = false;
+            break;
+        }
+        case 2:
+        {
+            // middle click
+            break;
+        }
+        case 3:
+        {
+            // right click
+            mdownright = false;
+            break;
+        }
+    }
+
     mousepos = getMousePos(event);
 }

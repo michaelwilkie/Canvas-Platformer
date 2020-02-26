@@ -55,7 +55,18 @@ class Particle extends Entity
 
             game_ctx.setTransform(this.scale, 0, 0, this.scale, this.pos.x, this.pos.y); // sets scale and origin
             game_ctx.rotate(this.angle * Math.PI / 180);
-            game_ctx.drawImage(this.img, this.framelist[this.frame] * this.width, 0, this.width / this.scale, this.height / this.scale, -this.width/2, -this.height/2, this.width, this.height);
+            game_ctx.drawImage
+            (
+                this.img, 
+                this.framelist[this.frame] * this.width, 
+                0, 
+                this.width / this.scale, 
+                this.height / this.scale, 
+                -this.width/2, 
+                -this.height/2, 
+                this.width, 
+                this.height
+            );
             game_ctx.setTransform(1,0,0,1,0,0);
 
             game_ctx.globalAlpha = temp;

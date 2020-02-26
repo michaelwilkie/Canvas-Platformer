@@ -22,7 +22,8 @@ function ui()
         ui_component_list[i].update();
     }
 
-    mlastdown       = mdown; // putting this here in case I have the game paused so I can still register 'press' vs 'unpress' mouse events
+    mlastdownleft   = mdownleft; // putting this here in case I have the game paused so I can still register 'press' vs 'unpress' mouse events
+    mlastdownright  = mdownright;
     mlastwheel      = mwheel;
     mlastwheeldown  = mwheeldown;
     mlastwheelup    = mwheelup;

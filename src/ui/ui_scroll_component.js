@@ -159,7 +159,7 @@ class UI_Scroll_Component extends UI_Component
         if (this.bDrawable)
         {
             // Press down
-            if (mdown && !mlastdown)
+            if (mdownleft && !mlastdownleft)
             {
                 ////////////////////////////
                 // Which tile did I click //
@@ -168,7 +168,7 @@ class UI_Scroll_Component extends UI_Component
             }
 
             // Down
-            if (mdown)
+            if (mdownleft)
             {
                 if (DEBUG_MODE) console.log('ui_scroll_component: ' + 'clicking');
                 //////////////////////////////////////
@@ -211,7 +211,7 @@ class UI_Scroll_Component extends UI_Component
             }
 
             // Press up
-            if (mlastdown && !mdown)
+            if (mlastdownleft && !mdownleft)
             {
                 this.current_horizontal_x = this.horizontal_scrollbar.x ;
                 this.current_horizontal_y = this.horizontal_scrollbar.y ;

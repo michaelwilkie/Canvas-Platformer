@@ -19,10 +19,11 @@
 class Layer
 {
     // speed defaults to 1
-    constructor(speed=1)
+    constructor(speed=1, name=null)
     {
         this.speed = speed;
         this.entlist = [];
+        this.name = name;
     }
     push(e)
     {

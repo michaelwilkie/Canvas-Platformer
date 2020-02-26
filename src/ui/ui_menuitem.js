@@ -15,5 +15,4 @@ class UI_MenuItem
         this.width  =    w;
         this.height =    h;
     }
-    
 }

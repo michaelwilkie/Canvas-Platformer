@@ -1,0 +1,6 @@
+A player should be able to walk off a cliff and grab the edge of it
+
+A player should be able to climb up from the ledge while hanging off of it
+
+Optionally:
+    A player should only be permitted to hang for a certain amout of time (less fun though)

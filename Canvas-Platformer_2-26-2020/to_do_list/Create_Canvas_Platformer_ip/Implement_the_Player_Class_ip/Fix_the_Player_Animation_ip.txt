@@ -1,0 +1,3 @@
+The player animation is not playing properly
+
+Fix it so that the player runs through each animation smoothly

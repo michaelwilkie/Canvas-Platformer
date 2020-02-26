@@ -88,9 +88,9 @@ class UI_Button extends UI_Component
         if (this.bDrawable)
         {
             var adjusted_mouse_position = {x: xoffset, y: yoffset};
-            if (mdown && checkPointCollision(this, adjusted_mouse_position))
+            if (mdownleft && checkPointCollision(this, adjusted_mouse_position))
             {
-                if (mdown != mlastdown)
+                if (mdownleft != mlastdownleft)
                 {
                     this.bClicked = true;
                 }

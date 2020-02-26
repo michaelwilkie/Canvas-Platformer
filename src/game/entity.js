@@ -40,25 +40,19 @@ class Entity
         this.gravity        = {x:  0, y:  0};
         this.friction       = {x:  0, y:  0};
         this.maxvel         = {x: 10, y: 10};
-
-        this.angle          = 0;
-        this.anglerate      = 0;
-
-        this.scale          = 1;
-
-        this.width          = w;
-        this.height         = h;
-
-        this.noCollide      = false;
-        this.xCollide       = false;
-        this.yCollide       = false;
-
-        this.isVisible      = true;
-
-        this.layer          = layer;
+        this.angle          = 0             ;
+        this.anglerate      = 0             ;
+        this.scale          = 1             ;
+        this.width          = w             ;
+        this.height         = h             ;
+        this.noCollide      = false         ;
+        this.xCollide       = false         ;
+        this.yCollide       = false         ;
+        this.isVisible      = true          ;
+        this.layer          = layer         ;
 
         this.img            = createImageObject(imgsrc); 
-
+        
         var temp = this;
         if (this.img != null)
         {

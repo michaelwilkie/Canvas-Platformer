@@ -18,6 +18,9 @@
 ```
 # Variables
 * All constants or variables whose values are not to be changed are to be in upper case
+```
+const screen_width -> const SCREEN_WIDTH
+```
 
 # Functions
 * All functions will follow the Java-esque function naming convention:

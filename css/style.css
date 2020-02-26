@@ -1,0 +1,141 @@
+body, html
+{
+    background-color: black;
+    color: white;
+}
+
+.gray-area
+{
+    background-color: rgba(58, 57, 57, 0.5);
+    border-radius: 5px;
+}
+
+.error-select
+{
+    background-color: red;
+}
+
+/* *************************** Column 1 Elements *************************** */
+
+
+/* *************************** Column 2 Elements *************************** */
+.col-mode 
+{
+    font-size: 30px;
+}
+
+.col-tileset
+{
+    margin-right: 5px;
+    font-size: 30px;
+}
+
+.col-displayoptions
+{
+    font-size: 20px;
+}
+.col-other
+{
+    font-size: 20px;
+}
+.row 
+{
+    width  : 100%;
+    margin : 5px             ;
+    /*border : 2px dotted red;*/
+    display: flex            ;
+}
+
+.column 
+{
+    /*border       : 2px dotted yellow;*/
+    border-radius: 5px                ;
+    margin: 5px                       ;
+    width: 100%;
+    font-size: 20px;
+}
+
+
+
+/* *************************** Tileset Items *************************** */
+img
+{
+    border: 2px solid black;
+}
+img .selected
+{
+    border : 2px solid red;
+    z-index: 2;
+}
+
+.wrapper 
+{
+    position: relative;
+    width   : 1204px  ;
+    height  : 804px   ;
+}
+.wrapper canvas 
+{
+    position: absolute;
+    top     : 0       ;
+    left    : 0       ;
+}
+
+/* *************************** Layer Elements *************************** */
+input
+{
+    background      : black;
+    color           : white;
+}
+.layer-element
+{
+    text-align      : center;
+    background-color: black;
+}
+.layer-element:hover
+{
+    /*filter: brightness(150%);*/
+    cursor: pointer;
+}
+
+
+#col2
+{
+    text-align: center;
+}
+
+#ui_canvas      { z-index: 2        ; }
+#game_canvas    { z-index: 1        ; }
+
+#div_layers_scrollarea
+{
+    background-color: rgba(27, 27, 27, 0.5);
+}
+
+#div_author
+{
+    font-size: 30px;
+}
+
+/* cursors: https://www.w3schools.com/cssref/playit.asp?filename=playcss_cursor&preval=alias */
+#div_edit_mode
+{
+    background: green;
+    /*display: table;*/
+    width: 100%;
+    margin: 5px;
+    text-align: center;
+    border-radius: 5px;
+}
+#div_edit_mode:hover
+{
+    filter: brightness(150%);
+    cursor: pointer;
+}
+
+img:hover
+{
+    border-color: crimson;
+    cursor: pointer;
+    z-index: 2;
+}

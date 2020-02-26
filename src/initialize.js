@@ -40,7 +40,7 @@ $(document).ready(function ()
 
     player = addPlayer(10, 10);
 
-    SCREEN_WIDTH  = game_canvas.width;
+    SCREEN_WIDTH  = game_canvas.width ;
     SCREEN_HEIGHT = game_canvas.height;
 
     // Set up player camera to follow player
@@ -50,8 +50,8 @@ $(document).ready(function ()
 
     // Set level boundaries
     level = new Level();
-    background_wall  = addWall(0,   0, null, null, MEDIA_DIR + "trees_fg.png"); // create background wall object
-    background_wall2 = addWall(0, 200, null, null, MEDIA_DIR + "trees_bg.png"); // create background wall object
+    background_wall  = addWall(0, -70, null, null, MEDIA_DIR + "trees_fg.png"); // create background wall object
+    background_wall2 = addWall(0, 150, null, null, MEDIA_DIR + "trees_bg.png"); // create background wall object
     
     // Load the tileset image.
     tileset_img = new Image();

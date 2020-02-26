@@ -42,8 +42,8 @@ function html_addElementToTileset(x, y, tilename)
     var imageObject          = new Image();
 
     // These offsets were tested manually
-    var xoffset              = 1205;
-    var yoffset              = 155;
+    var xoffset              = 0//1205;
+    var yoffset              = 0//155;
 
     new_canvas.width         = tile.width;
     new_canvas.height        = tile.height;
@@ -63,9 +63,9 @@ function html_addElementToTileset(x, y, tilename)
 
     imageObject.src             = new_canvas.toDataURL();
     imageObject.id              = tile.name + "_HTML"   ;
-    imageObject.style.position  = "absolute"            ;
-    imageObject.style.left      = (x + xoffset) + "px"  ;
-    imageObject.style.top       = (y + yoffset) + "px"  ;
+    imageObject.style.position  = "relative"            ;
+    //imageObject.style.left      = (x + xoffset) + "px"  ;
+    //imageObject.style.top       = (y + yoffset) + "px"  ;
     imageObject.name            = tilename              ;
     imageObject.xpos            = tile.x                ;
     imageObject.ypos            = tile.y                ;
@@ -83,8 +83,9 @@ function html_addElementToTileset(x, y, tilename)
 //////////////////////////////////////
 function html_initialize_globals()
 {
-    html_div_tileset   = document.getElementById("div_tileset" );
-    html_div_edit_mode = document.getElementById("div_editmode");
+    html_div_tileset            = document.getElementById("div_tileset"             );
+    html_div_edit_mode          = document.getElementById("div_edit_mode"           );
+    html_div_layers_scrollarea  = document.getElementById("div_layers_scrollarea"   );
 }
 ///////////////////////////////////////////////////////////
 //              initialize_edit_mode_html                //
