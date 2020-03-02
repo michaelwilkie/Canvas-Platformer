@@ -1,0 +1,28 @@
+Add a scrolling widget to a UI_Component
+
+This will help manage components with a large number of subcomponents
+be viewable
++-----------------------------------+
+|         Sample text             | |
+|         Other sample text       | |
+|         Sample text             | |
+|         Other sample text       | |
+|         Sample text             |-|
+|         Other sample text       |||
+|         Sample text             ||| <-- scroll bar
+|         Other sample text       |||
+|                                 |-|
++-----------------------------------+
+
+Also compatible with window layouts
++----UI Component A-----+----UI Component B-----+
+|  Sample text        | |     Some sample text  |
+|  Other sample text  | |                       |
+|  Sample text        | |                       |
+|  Other sample text  | |   Other sample text   |
+|  Sample text        |-|                       |
+|  Other sample text  |||                       |
+|  Sample text        |||                       |
+|  Other sample text  |||                       |
+|                     |-|                       |
++-----------------------+-----------------------+

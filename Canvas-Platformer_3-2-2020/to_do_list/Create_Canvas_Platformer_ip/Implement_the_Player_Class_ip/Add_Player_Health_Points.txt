@@ -1,0 +1,2 @@
+Add functionality to the player so that it has health points
+When these health points are less than zero, the player is now dead

@@ -1,0 +1,18 @@
+An entity with a health property should be able to display
+    their current health
+
+When an entity's health is zero, it dies
+What death means to an entity remains to be defined
+
++---------------------------------------+
+|                        ▓▓▓▓▓▓▓▓▓▓▓▓▓▓ |
+|                        ▓▓ BUILDING  ▓ |
+|     HP                 ▓▓▓▓▓▓▓▓▓▓▓▓▓▓ |
+|  [---   ]              ▓▓   HP        |
+|      o                 || [----]      |
+|     /|\                ||             |
+|     || \              q||p  <- DOOR   |
+|      |\                ||             |
+|      ||_               ||             |
+|=======================================|
++---------------------------------------+

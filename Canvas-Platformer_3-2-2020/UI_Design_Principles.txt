@@ -1,0 +1,16 @@
+1.  All UI Components are responsible for calling their children's draw functions
+2.  All UI Components are responsible for calling their children's update functions
+3.  All UI related classes are to inherit from UI_Component, unless inheriting from a subclass of UI_Component
+4.  All UI related classes are to have as default constructor parameters of their respective global variable ui_default_... value
+    For instance:
+        class UI_Label extends UI_Component
+        {
+            constructor(text, x, y, width, height, 
+            font             = ui_default_font,                 font must have ui_default_font as a default parameter
+            fontsize         = ui_default_fontsize,             fontsize must have ui_default_fontsize as a default parameter
+            text_color       = ui_default_text_color,           and so on...
+            background_color = ui_default_background_color,
+            text_alignment   = ui_default_text_alignment)
+            ...
+        }
+5. All UI Components that are only allowed interaction (UI_Component.bDrawable) if they are visible

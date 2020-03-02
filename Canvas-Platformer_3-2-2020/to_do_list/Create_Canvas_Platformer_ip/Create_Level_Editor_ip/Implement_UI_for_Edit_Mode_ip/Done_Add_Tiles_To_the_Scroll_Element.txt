@@ -1,0 +1,2 @@
+Add the tileset using the 'tileset' variable so
+the scroll component contains all of these.
