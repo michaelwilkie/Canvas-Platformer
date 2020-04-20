@@ -13,4 +13,4 @@
             text_alignment   = ui_default_text_alignment)
             ...
         }
-5. All UI Components that are only allowed interaction (UI_Component.bDrawable) if they are visible
+5. All UI Components are only allowed interaction (UI_Component.bDrawable) if they are visible

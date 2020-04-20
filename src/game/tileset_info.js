@@ -57,6 +57,7 @@ tileset.push({"name":"PLANT_TREE_LARGE_RIGHT_LEAVES"    , "x":864, "y":448, "wid
 
 // Bright Rock
 tileset.push({"name":"ROCK_BRIGHT_TOP_LEFT_EDGE"        , "x":704, "y":32 , "width":32, "height":32 });
+tileset.push({"name":"ROCK_BRIGHT_TOP_LEFT_EDGE2"       , "x":512, "y":224, "width":32, "height":32 });
 tileset.push({"name":"ROCK_BRIGHT_TOP_LEFT_CONCAVE"     , "x":736, "y":32 , "width":32, "height":32 });
 tileset.push({"name":"ROCK_BRIGHT_LEFT_EDGE"            , "x":736, "y":64 , "width":32, "height":32 });
 tileset.push({"name":"ROCK_BRIGHT_BOTTOM_LEFT_EDGE"     , "x":736, "y":96 , "width":32, "height":32 });
@@ -67,6 +68,7 @@ tileset.push({"name":"ROCK_BRIGHT_MIDDLE"               , "x":768, "y":64 , "wid
 tileset.push({"name":"ROCK_BRIGHT_BOTTOM"               , "x":784, "y":128, "width":32, "height":32 });
 
 tileset.push({"name":"ROCK_BRIGHT_TOP_RIGHT_EDGE"       , "x":864, "y":32 , "width":32, "height":32 });
+tileset.push({"name":"ROCK_BRIGHT_TOP_RIGHT_EDGE2"      , "x":544, "y":224, "width":32, "height":32 });
 tileset.push({"name":"ROCK_BRIGHT_TOP_RIGHT_CONCAVE"    , "x":832, "y":32 , "width":32, "height":32 });
 tileset.push({"name":"ROCK_BRIGHT_RIGHT_EDGE"           , "x":832, "y":64 , "width":32, "height":32 });
 tileset.push({"name":"ROCK_BRIGHT_BOTTOM_RIGHT_EDGE"    , "x":832, "y":96 , "width":32, "height":32 });

@@ -160,6 +160,7 @@ function initialize_edit_mode_html()
     current_y = 3 * 32;
     current_x = 2 * 32;
     html_addElementToTileset(current_x + (0 * tile_width), current_y + (0 * tile_height), "ROCK_BRIGHT_TOP_LEFT_EDGE"       );
+    html_addElementToTileset(current_x + (3 * tile_width), current_y + (3 * tile_height), "ROCK_BRIGHT_TOP_LEFT_EDGE2"      );
     html_addElementToTileset(current_x + (1 * tile_width), current_y + (1 * tile_height), "ROCK_BRIGHT_LEFT_EDGE"           );
     html_addElementToTileset(current_x + (1 * tile_width), current_y + (2 * tile_height), "ROCK_BRIGHT_BOTTOM_LEFT_EDGE"    );
     html_addElementToTileset(current_x + (1 * tile_width), current_y + (0 * tile_height), "ROCK_BRIGHT_TOP_LEFT_CONCAVE"    );  
@@ -167,15 +168,16 @@ function initialize_edit_mode_html()
     html_addElementToTileset(current_x + (2 * tile_width), current_y + (3 * tile_height), "ROCK_BRIGHT_BOTTOM_LEFT_EDGE"    );
 
     html_addElementToTileset(current_x + (2 * tile_width), current_y + (0 * tile_height), "ROCK_BRIGHT_TOP_MIDDLE"          );
-    html_addElementToTileset(current_x + (3 * tile_width), current_y + (0 * tile_height), "ROCK_BRIGHT_TOP_MIDDLE"          );
-    html_addElementToTileset(current_x + (4 * tile_width), current_y + (0 * tile_height), "ROCK_BRIGHT_TOP_MIDDLE"          );
-    html_addElementToTileset(current_x + (2 * tile_width), current_y + (1 * tile_height), "ROCK_BRIGHT_MIDDLE"              );
+    //html_addElementToTileset(current_x + (3 * tile_width), current_y + (0 * tile_height), "ROCK_BRIGHT_TOP_MIDDLE"          );
+    //html_addElementToTileset(current_x + (4 * tile_width), current_y + (0 * tile_height), "ROCK_BRIGHT_TOP_MIDDLE"          );
+    //html_addElementToTileset(current_x + (2 * tile_width), current_y + (1 * tile_height), "ROCK_BRIGHT_MIDDLE"              );
     html_addElementToTileset(current_x + (3 * tile_width), current_y + (1 * tile_height), "ROCK_BRIGHT_MIDDLE"              );
-    html_addElementToTileset(current_x + (3 * tile_width), current_y + (2 * tile_height), "ROCK_BRIGHT_MIDDLE"              );
-    html_addElementToTileset(current_x + (4 * tile_width), current_y + (1 * tile_height), "ROCK_BRIGHT_MIDDLE"              );
+    //html_addElementToTileset(current_x + (3 * tile_width), current_y + (2 * tile_height), "ROCK_BRIGHT_MIDDLE"              );
+    //html_addElementToTileset(current_x + (4 * tile_width), current_y + (1 * tile_height), "ROCK_BRIGHT_MIDDLE"              );
     html_addElementToTileset(current_x + (3 * tile_width), current_y + (3 * tile_height), "ROCK_BRIGHT_BOTTOM"              );
 
     html_addElementToTileset(current_x + (6 * tile_width), current_y + (0 * tile_height), "ROCK_BRIGHT_TOP_RIGHT_EDGE"      );
+    html_addElementToTileset(current_x + (6 * tile_width), current_y + (1 * tile_height), "ROCK_BRIGHT_TOP_RIGHT_EDGE2"     );
     html_addElementToTileset(current_x + (5 * tile_width), current_y + (0 * tile_height), "ROCK_BRIGHT_TOP_RIGHT_CONCAVE"   );
     html_addElementToTileset(current_x + (5 * tile_width), current_y + (1 * tile_height), "ROCK_BRIGHT_RIGHT_EDGE"          );
     html_addElementToTileset(current_x + (5 * tile_width), current_y + (2 * tile_height), "ROCK_BRIGHT_BOTTOM_RIGHT_EDGE"   );
@@ -202,12 +204,12 @@ function initialize_edit_mode_html()
     html_addElementToTileset(current_x + (2 * tile_width), current_y + (3 * tile_height), "ROCK_DARK_BOTTOM_LEFT_EDGE"      );
 
     html_addElementToTileset(current_x + (2 * tile_width), current_y + (0 * tile_height), "ROCK_DARK_TOP_MIDDLE"            );
-    html_addElementToTileset(current_x + (3 * tile_width), current_y + (0 * tile_height), "ROCK_DARK_TOP_MIDDLE"            );
-    html_addElementToTileset(current_x + (4 * tile_width), current_y + (0 * tile_height), "ROCK_DARK_TOP_MIDDLE"            );
+    //html_addElementToTileset(current_x + (3 * tile_width), current_y + (0 * tile_height), "ROCK_DARK_TOP_MIDDLE"            );
+    //html_addElementToTileset(current_x + (4 * tile_width), current_y + (0 * tile_height), "ROCK_DARK_TOP_MIDDLE"            );
     html_addElementToTileset(current_x + (2 * tile_width), current_y + (1 * tile_height), "ROCK_DARK_MIDDLE"                );
-    html_addElementToTileset(current_x + (3 * tile_width), current_y + (1 * tile_height), "ROCK_DARK_MIDDLE"                );
-    html_addElementToTileset(current_x + (3 * tile_width), current_y + (2 * tile_height), "ROCK_DARK_MIDDLE"                );
-    html_addElementToTileset(current_x + (4 * tile_width), current_y + (1 * tile_height), "ROCK_DARK_MIDDLE"                );
+    //html_addElementToTileset(current_x + (3 * tile_width), current_y + (1 * tile_height), "ROCK_DARK_MIDDLE"                );
+    //html_addElementToTileset(current_x + (3 * tile_width), current_y + (2 * tile_height), "ROCK_DARK_MIDDLE"                );
+    //html_addElementToTileset(current_x + (4 * tile_width), current_y + (1 * tile_height), "ROCK_DARK_MIDDLE"                );
     html_addElementToTileset(current_x + (3 * tile_width), current_y + (3 * tile_height), "ROCK_DARK_BOTTOM"                );
 
     html_addElementToTileset(current_x + (6 * tile_width), current_y + (0 * tile_height), "ROCK_DARK_TOP_RIGHT_EDGE"        );

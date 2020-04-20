@@ -1,6 +1,6 @@
-/****************************************************/
-/* Game global variables (most of them anyway)      */
-/****************************************************/
+/*************************/
+/* Game global variables */
+/*************************/
 "use strict";
 
 const DEBUG_MODE = false;
@@ -32,34 +32,32 @@ var mlastwheelup        = false;
 var mlastwheeldown      = false;
 var MOUSE_DEBUG_MODE    = false;
 
-const GRID_TIGHTNESS    = 64;       // tightens the grid
+var selected_entity_pos = null;                 // For saving the position of an entity before it gets dragged around by the mouse
 
-// Enumerator for parallelaxing
-const LAYER_ENUM = {
-    "FOREGROUND1": 0,
-    "BACKGROUND1": 1,
-    "BACKGROUND2": 2
-};
+const GRID_TIGHTNESS    = 64;                   // controls the tightness of the tile-placement grid
 
-var layers          = [];                       // used for parallelaxing, might not contain all entities
+var layers          = [];                       // array of Layer objects, used for parallelaxing, might not contain all entities
 var player              ;                       // Player object
 var playercamera        ;                       // player's Camera object
-var entlist         = [];                       // list of all entities
+var entlist         = [];                       // array of Entities, list of all entities
 var pucks           = [];                       // deprecated (used in a different project, this may be repurposed)
 var level               ;                       // level object, will contain current level data
-var background_wall     ;                       // temporary object, used as background
-var background_wall2    ;                       // temporary object, used as background
+var background_wall     ;                       // Wall object, temporary object, used as background
+var background_wall2    ;                       // Wall object, temporary object, used as background
 var tileset_img         ;                       // image object of the tileset, this will be used to display different tiles
 
 const GAME_MODE_ENUM = {                        // game mode enumerator
     EDIT_MODE: 0,                               // level editing mode
     PLAY_MODE: 1                                // normal playing mode
 };
-var gameglobals = { 
-    time: 0        ,                            // game time
-    fps : 60       ,                            // framerate
-    dt  : 0.15     ,                            // delta time
-    mode: GAME_MODE_ENUM.PLAY_MODE              // current gamde mode
+var gamecore = {
+    fps             : 60                        ,   // framerate
+    time            : null                      ,   // GameTime object, for keeping track of game's time/tickrate
+    mode            : GAME_MODE_ENUM.PLAY_MODE  ,   // current game mode
+    animation_timer : 40                        ,   // time in milliseconds between animation frame
+    gravity         : {x: 0.0  , y: 5.0}        ,   // default gravity for all entities
+    friction        : {x: 4.0  , y: 0.0}        ,   // default friction for all entities
+    max_velocity    : {x: 2.0  , y: 2.0}            // default max velocity for all entites
 };
 
 var imagesLoaded = false;                       // used to check if all images are loaded so no 404 errors are thrown

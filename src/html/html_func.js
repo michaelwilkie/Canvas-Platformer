@@ -60,37 +60,44 @@ function html_setGameMode(mode)
 //////////////////////////////////////////////////////////////////
 function html_imgClickHandler(event)
 {
-    if (gameglobals.mode == GAME_MODE_ENUM.EDIT_MODE)
+    if (gamecore.mode == GAME_MODE_ENUM.EDIT_MODE)
     {
-        event = event || window.event;
-        var target = event.target || event.srcElement;
-
-        //////////////////////////////////////////
-        // If the target wasn't already clicked //
-        //////////////////////////////////////////
-        if (!target.wasClicked)
+        if (html_selected_layer != null)
         {
-            var children = html_div_tileset.children;
-            for (var i = 0; i < children.length; i++)
-            {
-                children[i].classList.remove("selected");
-                children[i].wasClicked = false;
-            }
+            event = event || window.event;
+            var target = event.target || event.srcElement;
 
-            html_selectedObject = target    ;
-            target.classList.add("selected");
-            target.wasClicked   = true      ;
-            mouseselectedentity = addTile(mousepos.x, mousepos.y, getTileByName(target.name));
-            mousedif            = {x: mousepos.x - mouseselectedentity.pos.x, y: mousepos.y - mouseselectedentity.pos.y};
-        }
-        ////////////////////////////////////
-        // The target was already clicked //
-        ////////////////////////////////////
+            //////////////////////////////////////////
+            // If the target wasn't already clicked //
+            //////////////////////////////////////////
+            if (!target.wasClicked)
+            {
+                var children = html_div_tileset.children;
+                for (var i = 0; i < children.length; i++)
+                {
+                    children[i].classList.remove("selected");
+                    children[i].wasClicked = false;
+                }
+
+                html_selected_object = target   ;
+                target.classList.add("selected");
+                target.wasClicked   = true      ;
+                mouseselectedentity = addTile(mousepos.x, mousepos.y, getTileByName(target.name));
+                mousedif            = {x: mousepos.x - mouseselectedentity.pos.x, y: mousepos.y - mouseselectedentity.pos.y};
+            }
+            ////////////////////////////////////
+            // The target was already clicked //
+            ////////////////////////////////////
+            else
+            {
+                game_unselectObject();
+            }
+        } // end if (html_selected_layer != null)
         else
         {
-            game_unselectObject();
+            html_layersErrorAnimation();
         }
-    } // end if (gameglobals.mode == GAME_MODE_ENUM.EDIT_MODE)
+    } // end if (gamecore.mode == GAME_MODE_ENUM.EDIT_MODE)
     else
     {
         html_playErrorAnimation();
@@ -146,6 +153,84 @@ function html_playErrorAnimation()
     setTimeout(()=>{$('#div_edit_mode').removeClass('error-select')}, 1000)
 }
 
+///////////////////////////////////////////////////////////////////
+//                    html_layersErrorAnimation                  //
+// Function:                                                     //
+//     Plays red to green animation on the div_layers_scrollarea //
+//     element
+//     If it is already doing it, it just resets it              //
+// Return value:                                                 //
+//     None                                                      //
+///////////////////////////////////////////////////////////////////
+function html_layersErrorAnimation()
+{
+    // Give a nice red to green animation
+    $('#div_layers_scrollarea').addClass('error-select');
+    setTimeout(()=>{$('#div_layers_scrollarea').removeClass('error-select')}, 1000)
+}
+
+//////////////////////////////////////////////////
+//              html_applyRedBorder             //
+// Function:                                    //
+//     Adds 'redborder' class to an html object //
+// Return value:                                //
+//     None                                     //
+//////////////////////////////////////////////////
+function html_applyRedBorder(html_object)
+{
+    $('#' + html_object.id).addClass('redborder');
+}
+
+/////////////////////////////////////////////////////
+//              html_removeRedBorder               //
+// Function:                                       //
+//     Removes 'redborder' class of an html object //
+// Return value:                                   //
+//     None                                        //
+/////////////////////////////////////////////////////
+function html_removeRedBorder(html_object)
+{
+    $('#' + html_object.id).removeClass('redborder');
+}
+
+////////////////////////////////////////////////////////////////////////
+//                     html_applySelectedLayerStyle                   //
+// Function:                                                          //
+//     Applies the 'selected-layer' style to the selected html object //
+// Return value:                                                      //
+//     None                                                           //
+////////////////////////////////////////////////////////////////////////
+function html_applySelectedLayerStyle(html_object)
+{
+    $('#' + html_object.id).addClass('selected-layer');
+}
+
+//////////////////////////////////////////////////////////////////////////
+//                     html_removeSelectedLayerStyle                    //
+// Function:                                                            //
+//     Removes the 'selected-layer' style from the selected html object //
+// Return value:                                                        //
+//     None                                                             //
+//////////////////////////////////////////////////////////////////////////
+function html_removeSelectedLayerStyle(html_object)
+{
+    $('#' + html_object.id).removeClass('selected-layer');
+}
+
+////////////////////////////////////////////////
+//             html_printLayerList            //
+// Function:                                  //
+//     Prints the list of html layer elements //
+// Return value:                              //
+//     None                                   //
+////////////////////////////////////////////////
+function html_printLayerList()
+{
+    var html_layer_info_array = $('#div_layer_info').children();
+
+    console.log(html_layer_info_array);
+}
+
 //////////////////////////////////////////////////////////////
 //                  html_changeLayerName                    //
 // Function:                                                //
@@ -159,7 +244,7 @@ function html_changeLayerName(element)
     /////////////////////////////////
     // Only permitted in edit mode //
     /////////////////////////////////
-    if (gameglobals.mode != GAME_MODE_ENUM.EDIT_MODE)
+    if (gamecore.mode != GAME_MODE_ENUM.EDIT_MODE)
     {
         html_playErrorAnimation();
         return;
@@ -196,7 +281,7 @@ function html_changeLayerName(element)
             return;
         }
 
-        // Now that I've hit the enter key, now I can assign this new ID to the HTML elements
+        // Now that I've hit the enter key, I can assign this new ID to the HTML elements
 
         // Give the layer's html components a new id
         var new_id = element.value;
@@ -208,6 +293,9 @@ function html_changeLayerName(element)
         $('#' + element.id).removeClass('inputting');
         $('#' + element.id).addClass('enter-select');
         setTimeout(function(){$('#' + element.id).removeClass('enter-select')}, 2000);
+
+        // Apply new name to the game object
+        game_findLayer(root_id).name = new_id;
     }
     /////////////////////////////////////////////
     // Some key other than 'enter' was pressed //
@@ -237,9 +325,9 @@ function html_changeLayerName(element)
 //     IDs of each element have their html type       //
 //     appended as a suffix except for <i> elements   //
 //                                                    //
-//    p -> id + _span                                 //
+//    p     -> id + _span                             //
 //    input -> id + _input                            //
-//    i-> id                                          //
+//    i     -> id                                     //
 //                                                    //
 // Return value:                                      //
 //     String                                         //
@@ -247,9 +335,71 @@ function html_changeLayerName(element)
 function html_generateLayerElementString(id)
 {
     return  '<p onclick="html_selectLayerElement(this)" class="layer-element" id="' + id + '_span">' + '\n' + 
-               '<i class="fa fa-minus-circle tooltip" id=' + id + ' onclick="html_removeLayerElement(this.id)" title="Delete layer"></i>' + '\n' + 
+               '<i class="fa fa-minus-circle tooltip" id="' + id + '" onclick="html_removeLayerElement(this.id)" title="Delete layer"></i>' + '\n' + 
                '<input type="text" spellcheck="false" onkeyup="html_changeLayerName(this)" id="' + id + '_input" value="' + id + '"></input>' + '\n' +
+               '<i class="fa fa-arrow-up" id="' + id + '_uparrow" title="Move layer frontwards" onclick="html_moveLayerUp(this)"></i>' + '\n' +
+               '<i class="fa fa-arrow-down" id="' + id + '_downarrow" title="Move layer backwards" onclick="html_moveLayerDown(this)"></i>' + '\n' +
             '</p>';
+}
+
+//////////////////////////////////////////////////////////////////////
+//                  html_generateObjectInfoString                   //
+// Function:                                                        //
+//     Creates 2 column layout string with entity name as the title //
+// Return value:                                                    //
+//     String                                                       //
+//////////////////////////////////////////////////////////////////////
+function html_generateObjectInfoString(html_tile_object)
+{
+    return '<div class="row" id="div_object_row">' + '\n' +
+               '<div class="column" id="div_object_column_left"></div>' + '\n' +
+               '<div class="column" id="div_object_column_right" style="font-size: 16px">' + html_tile_object.entity_reference.name + '</div>' + '\n' +
+           '</div>';
+}
+
+/////////////////////////////////////////////////////////////
+//                   html_moveLayerUp                      //
+// Function:                                               //
+//     Reorders layer html elements, move the element that //
+//     called this function up one                         //
+// Return value:                                           //
+//     None                                                //
+/////////////////////////////////////////////////////////////
+function html_moveLayerUp(html_layer_object)
+{
+    var layer_name  = html_layer_object.id.substring(0, html_layer_object.id.length - "_uparrow".length);
+    var layer_index = game_getLayerIndexByName(layer_name);
+    if (DEBUG_MODE) console.log("layer index: " + layer_index);
+    if (layer_index != null)
+    {
+        if (layer_index < layers.length - 1)
+        {
+            game_swapLayers(layers[layer_index], layers[layer_index + 1]);
+            html_updateLayersScrollArea();
+        }
+    }
+}
+
+/////////////////////////////////////////////////////////////
+//                   html_moveLayerDown                    //
+// Function:                                               //
+//     Reorders layer html elements, move the element that //
+//     called this function down one                       //
+// Return value:                                           //
+//     None                                                //
+/////////////////////////////////////////////////////////////
+function html_moveLayerDown(html_layer_object)
+{
+    var layer_name  = html_layer_object.id.substring(0, html_layer_object.id.length - "_downarrow".length);
+    var layer_index = game_getLayerIndexByName(layer_name);
+    if (layer_index != null)
+    {
+        if (layer_index > 0)
+        {
+            game_swapLayers(layers[layer_index], layers[layer_index - 1]);
+            html_updateLayersScrollArea();
+        }
+    }
 }
 
 ////////////////////////////////////////////////////////
@@ -260,18 +410,51 @@ function html_generateLayerElementString(id)
 // Return value:                                      //
 //     String                                         //
 ////////////////////////////////////////////////////////
-function html_generateLayerInfoString(layer_object)
+function html_generateLayerInfoString(html_layer_object)
 {
-    if (layer_object != null)
+    if (html_layer_object != null)
     {
-        return '<p>' + layer_object.name + '</p>';
+        return '<p style="float: left ; margin: 5px;">' + html_layer_object.name  + '</p>' +
+               '<p style="float: right; margin: 5px;">' + 'Scroll Speed: ' + html_layer_object.speed + '</p><br><br>';
     }
     return null;
 }
 
+//////////////////////////////////////////////////////////////////////
+//                       html_objectOnClick                         //
+// Function:                                                        //
+//     Populates the div_object_info element with information about //
+//     the entity clicked in the div_layer_info element             //
+// Return value:                                                    //
+//     None                                                         //
+//////////////////////////////////////////////////////////////////////
 function html_objectOnClick(selected_object)
 {
-    playercamera.snapToEntity(selected_object.target.entity_reference);
+    $('#div_object_info').empty();
+    var html_object = selected_object.target;
+
+    $('#div_object_info').append(html_generateObjectInfoString(html_object));
+    console.log(html_object.id);
+    var clone = $('#' + html_object.id).clone(false).prop('id', html_object.id + '_object_clone'); // clone(false) means don't clone event handlers
+
+    $('#div_object_column_left').append(clone);
+    
+    playercamera.snapToEntity(selected_object.target.entity_reference); // for hovering the camera over the selected object
+    html_selected_object = selected_object.target;                      // for populating html elements
+    mouseselectedentity  = selected_object.target.entity_reference;     // for dragging the object around
+    selected_entity_pos  = game_copyPosition(mouseselectedentity.pos);  // for saving the mouse position before moving it around
+}
+
+///////////////////////////////////////////////////////////////////////
+//                      html_getLayerNameFromID                      //
+// Function:                                                         //
+//     Trims the suffix off an html element id to get the layer name //
+// Return value:                                                     //
+//     String                                                        //
+///////////////////////////////////////////////////////////////////////
+function html_getLayerNameFromID(html_object)
+{
+    return html_object.id.substring(0, html_object.id.length - "_span".length);
 }
 
 /////////////////////////////////////////////////////////////////////////////////////
@@ -283,19 +466,30 @@ function html_objectOnClick(selected_object)
 // Return value:                                                                   //
 //     None                                                                        //
 /////////////////////////////////////////////////////////////////////////////////////
-function html_selectLayerElement(html_selected_layer)
+function html_selectLayerElement(html_selected_layer_param)
 {
     $("#div_layer_info").empty();
+    $('#div_object_info').empty();
+
+    // Have I already selected a layer?
+    if (html_selected_layer != null)
+    {
+        html_removeSelectedLayerStyle(html_selected_layer);
+    }
     
+    // Point global variable to this newly selected layer and give it a 'selected' style
+    html_selected_layer = html_selected_layer_param;
+    html_applySelectedLayerStyle(html_selected_layer);
+
     // <p> have default ids of: "LayerNameHere_span"
     // So I am cutting off the _span part to get the actual layer name
-    var layer_name = html_selected_layer.id.substring(0, html_selected_layer.id.length - "_span".length);
+    var layer_name = html_getLayerNameFromID(html_selected_layer);
 
-    if (DEBUG_MODE) console.log(layer_name);
-
+    // Find the corresponding layer object in the layers array
     var layer_object = game_findLayer(layer_name);
     if (layer_object != null)
     {
+        // forgot why I am adding this property
         $('#div_layer_info').prop('selected_layer', layer_object);
 
         /////////////////////////
@@ -344,7 +538,7 @@ function html_selectLayerElement(html_selected_layer)
                             clone.prop('entity_reference', entity);
                             clone.click(html_objectOnClick);
 
-                            $('#div_layer_info').append(clone); 
+                            $('#div_layer_info').append(clone);
                         }
 
                     } // end for(...)
@@ -357,6 +551,26 @@ function html_selectLayerElement(html_selected_layer)
 
     } // end if (layer_object != null)
 
+} // end of html_selectLayerElement(html_selected_layer_param)
+
+////////////////////////////////////////////////////////////////////
+//                 html_updateLayersScrollArea                    //
+// Function:                                                      //
+//     Loops through each layer object and populates the          //
+//     div_layers_scrollarea element with a list in descending in //
+//     the order specified by the user                            //
+// Return value:                                                  //
+//     None                                                       //
+////////////////////////////////////////////////////////////////////
+function html_updateLayersScrollArea()
+{
+    $('#div_layers_scrollarea').empty();
+    // Looping backwards because the last elements are the top-most ones, so
+    // they will get appended first
+    for (var i = layers.length - 1; i >= 0; i--)
+    {
+        $('#div_layers_scrollarea').append(html_generateLayerElementString(layers[i].name));
+    }
 }
 
 ////////////////////////////////////////////////////////////////
@@ -371,13 +585,13 @@ function html_addLayerElement(speed=1, name=null)
     //////////////////////////////////////////////////
     // Layer manipulation only allowed in edit mode //
     //////////////////////////////////////////////////
-    if (gameglobals.mode == GAME_MODE_ENUM.EDIT_MODE)
+    if (gamecore.mode == GAME_MODE_ENUM.EDIT_MODE)
     {
         var layer_speed = speed;
         var layer_id    = name || 'LayerName' + '_' + html_getUniqueID(); // Either 'name' if it is not null else LayerName + unique_id
 
-        $('#div_layers_scrollarea').append(html_generateLayerElementString(layer_id));
         createLayer(layer_speed, layer_id);
+        html_updateLayersScrollArea();
     }
     else
     {
@@ -394,7 +608,7 @@ function html_addLayerElement(speed=1, name=null)
 //////////////////////////////////////////////
 function html_removeLayerElement(id)
 {
-    if (gameglobals.mode == GAME_MODE_ENUM.EDIT_MODE)
+    if (gamecore.mode == GAME_MODE_ENUM.EDIT_MODE)
     {
         $('#' + id + '_span').remove();
     }

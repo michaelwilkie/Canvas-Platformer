@@ -1,0 +1,10 @@
+The player or player-like entities should be able to open doors
+
+The door is either unlocked or locked
+
+Any collectible object should have candidacy to unlocking the door
+
+Any player or player-like entity should be able to open locked doors
+    with their corresponding in their inventory
+
+

@@ -7,6 +7,7 @@
 
 function game()
 {    
+    // Wait for all images to be loaded in before attempting to play
     if(!imagesLoaded)
     {
         imagesLoaded = allImagesLoaded();
@@ -22,7 +23,7 @@ function game()
             if (DEBUG_MODE) console.log("Key: '~' pressed");
             game_transitionMode();
         }
-        switch (gameglobals.mode)
+        switch (gamecore.mode)
         {
             case GAME_MODE_ENUM.PLAY_MODE:
             {
@@ -45,14 +46,16 @@ function game()
 
                 if (mouseselectedentity != null)
                 {
-                    mouseselectedentity.draw(playercamera);
+                    mouseselectedentity.draw(playercamera, game_findLayer(html_getLayerNameFromID(html_selected_layer)).speed);
                 }
                 break;
             }
         }
+        // Obtain a copy of previously pressed keys to detect any key-press changes for the next frame
         keyhandler.updateLastKeypress();
-        playercamera.update(gameglobals.mode == GAME_MODE_ENUM.EDIT_MODE);
-        gameglobals.time++;
+
+        // Adjust camera according to mode
+        playercamera.update(gamecore.mode == GAME_MODE_ENUM.EDIT_MODE);
     }
 }
 
@@ -82,7 +85,7 @@ function handleEditModeControls()
     {
         if (mouseselectedentity != null)
         {
-            game_unselectObject();
+            game_deleteSelectedObject();
         }
     }
 }
@@ -90,31 +93,30 @@ function handleEditModeControls()
 //////////////////////////////////////////////
 //           game_transitionMode            //
 // Function:                                //
-//     Toggles the gameglobals mode         //
+//     Toggles the gamecore mode            //
 //     Calls html_transitionMode afterwards //
 // Return value:                            //
 //     None                                 //
 //////////////////////////////////////////////
 function game_transitionMode()
 {
-    switch (gameglobals.mode)
+    switch (gamecore.mode)
     {
         case GAME_MODE_ENUM.PLAY_MODE:
         {
             if (DEBUG_MODE) console.log("Edit mode");
-            gameglobals.mode = GAME_MODE_ENUM.EDIT_MODE;
+            gamecore.mode = GAME_MODE_ENUM.EDIT_MODE;
             break;
         }
         case GAME_MODE_ENUM.EDIT_MODE:
         {
             if (DEBUG_MODE) console.log("Play mode");
-            gameglobals.mode = GAME_MODE_ENUM.PLAY_MODE;
+            gamecore.mode = GAME_MODE_ENUM.PLAY_MODE;
             break;
         }
     }
-    html_setGameMode(gameglobals.mode);
+    html_setGameMode(gamecore.mode);
     game_unselectObject();
-    ui_edit_mode_component.scroll_component.selectedObject = null;
 }
 
 //////////////////////////////////////////////////////////
@@ -131,13 +133,13 @@ function game_setGameMode(mode)
         case GAME_MODE_ENUM.PLAY_MODE:
         {
             if (DEBUG_MODE) console.log("Play mode");
-            gameglobals.mode = GAME_MODE_ENUM.PLAY_MODE;
+            gamecore.mode = GAME_MODE_ENUM.PLAY_MODE;
             break;
         }
         case GAME_MODE_ENUM.EDIT_MODE:
         {
             if (DEBUG_MODE) console.log("Edit mode");
-            gameglobals.mode = GAME_MODE_ENUM.EDIT_MODE;
+            gamecore.mode = GAME_MODE_ENUM.EDIT_MODE;
             break;
         }
     }
@@ -154,18 +156,168 @@ function game_setGameMode(mode)
 //////////////////////////////////////////////////////
 function game_unselectObject()
 {
-    html_applyDefaultStyleToImg(html_selectedObject);
+    html_applyDefaultStyleToImg(html_selected_object);
     if (mouseselectedentity != null)
     {
-        mouseselectedentity.killSelf();
+        // Don't want the entity to remove itself from the entlist if I'm just unselecting it
+        //mouseselectedentity.killSelf();
     }
     mouseselectedentity = null;
-    html_selectedObject = null;
+    html_selected_object = null;
     ui_edit_mode_component.scroll_component.selectedObject = null;
 }
 
+//////////////////////////////////////////////////
+//           game_deleteSelectObject            //
+// Function:                                    //
+//     Deletes any object being held by mouse   //
+//     Deletes all html elements related to it  //
+//     Removes it from the layer associated     //
+// Return value:                                //
+//     None                                     //
+//////////////////////////////////////////////////
+function game_deleteSelectedObject()
+{
+    html_applyDefaultStyleToImg(html_selected_object);
+    if (mouseselectedentity != null)
+    {
+        // Delete the object
+        mouseselectedentity.killSelf();
+    }
+
+    // Let go of the reference of the used-to-be object
+    mouseselectedentity = null;
+    html_selected_object = null;
+    ui_edit_mode_component.scroll_component.selectedObject = null;
+
+    // Show this object has been removed by refreshing the html layer object
+    html_selectLayerElement(html_selected_layer);
+}
+
+//////////////////////////////////////////////////////////////
+//                 game_getLayerIndexByName                 //
+// Function:                                                //
+//     Returns the index a layer is inside the layers array //
+// Return value:                                            //
+//     Number of null                                       //
+//////////////////////////////////////////////////////////////
+function game_getLayerIndexByName(name)
+{
+    // Calling game_findLayer is unnecessary for the functionality of this function
+    // but it does help with error checking
+    var layer = game_findLayer(name);
+    for (var i = 0; i < layers.length; i++)
+    {
+        if (layer.name == layers[i].name)
+        {
+            return i;
+        }
+    }
+    return null;
+}
+
+//////////////////////////////////////////////
+//             game_swapLayers              //
+// Function:                                //
+//     Switches 2 layers in the layers list //
+// Return value:                            //
+//     None                                 //
+//////////////////////////////////////////////
+function game_swapLayers(layer1, layer2)
+{
+    if (DEBUG_MODE) console.log("Attempting to swap");
+    var index1 = null;
+    var index2 = null;
+    for (var i = 0; i < layers.length; i++)
+    {
+        if (layer1 == layers[i])
+        {
+            index1 = i;
+            break;
+        }
+    }
+    for (var i = 0; i < layers.length; i++)
+    {
+        if (layer2 == layers[i])
+        {
+            index2 = i;
+            break;
+        }
+    }
+    if (index1 != null && index2 != null)
+    {
+        var temp = layers[index1];
+        layers[index1] = layers[index2];
+        layers[index2] = temp;
+    }
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//      Snapping a selected tile to the grid lines represented by the '+' symbols:                           //
+//                                                                                                           //
+//      1.  Calculate how many + symbols I am from the origin (0,0)                                          //
+//          Distance between + symbols is GRID_TIGHTNESS                                                     //
+//          The number of + symbols from x axis is (mousepos.x / GRID_TIGHTNESS)                             //
+//          The number of + symbols from y axis is (mousepos.y / GRID_TIGHTNESS)                             //
+//                                                                                                           //
+//      2.  Calculate how many + symbols the camera is from the origin (0,0)                                 //
+//          Distance between + symbols is GRID_TIGHTNESS                                                     //
+//          The number of + symbols from x axis is (playercamera.x / GRID_TIGHTNESS)                         //
+//          The number of + symbols from y axis is (playercamera.y / GRID_TIGHTNESS)                         //
+//                                                                                                           //
+//      3.  Calculate relative position of cursor                                                            //
+//          Cursor's relative x position: cursor_grid_multiples_x * GRID_TIGHTNESS                           //
+//          Cursor's relative y position: cursor_grid_multiples_y * GRID_TIGHTNESS                           //
+//                                                                                                           //
+//      4.  Calculate relative position of camera                                                            //
+//          Camera's relative x position: camera_grid_multiples_x * GRID_TIGHTNESS                           //
+//          Camera's relative y position: camera_grid_multiples_y * GRID_TIGHTNESS                           //
+//                                                                                                           //
+//      5.  Add relative position of camera and the scaled position of cursor                                //
+//          Resulting x position: (cursor_relative_position_x / camera_scale_x) + camera_relative_position_x //
+//          Resulting y position: (cursor_relative_position_y / camera_scale_y) + camera_relative_position_y //
+//      +-----------------------level---------------------------+                                            //
+//      |   +   +   +   +   +   +   +   +   +   +   +   +   +   |                                            //
+//      |   +   +   +   +   +   +   +   +   +   +   +   +   +   |                                            //
+//      |   +   +   +---camera---+  +   +   +   +   +   +   +   |                                            //
+//      |   +   +   |  o    +   +|  +   +   +   +   +   +   +   |                                            //
+//      |   +   +   | cursor+   +|  +   +   +   +   +   +   +   |                                            //
+//      |   +   +   |   +   +   +|  +   +   +   +   +   +   +   |                                            //
+//      |   +   +   +------------+  +   +   +   +   +   +   +   |                                            //
+//      |   +   +   +   +   +   +   +   +   +   +   +   +   +   |                                            //
+//      |   +   +   +   +   +   +   +   +   +   +   +   +   +   |                                            //
+//      |   +   +   +   +   +   +   +   +   +   +   +   +   +   |                                            //
+//      |   +   +   +   +   +   +   +   +   +   +   +   +   +   |                                            //
+//      |   +   +   +   +   +   +   +   +   +   +   +   +   +   |                                            //
+//      +-------------------------------------------------------+                                            //
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+function game_calculateRelativeMousePosition()
+{
+    var layer_speed = game_findLayer(html_getLayerNameFromID(html_selected_layer)).speed;
+
+    var cursor_grid_multiples_x     = Math.floor(mousepos.x     / GRID_TIGHTNESS / layer_speed);
+    var cursor_grid_multiples_y     = Math.floor(mousepos.y     / GRID_TIGHTNESS / layer_speed);
+
+    var camera_grid_multiples_x     = Math.floor(playercamera.x / GRID_TIGHTNESS / layer_speed);
+    var camera_grid_multiples_y     = Math.floor(playercamera.y / GRID_TIGHTNESS / layer_speed);
+    
+    var camera_scale_x              = playercamera.zoomx;
+    var camera_scale_y              = playercamera.zoomy;
+
+    var camera_relative_position_x  = (camera_grid_multiples_x * GRID_TIGHTNESS * layer_speed);
+    var camera_relative_position_y  = (camera_grid_multiples_y * GRID_TIGHTNESS * layer_speed);
+
+    var cursor_relative_position_x  = (cursor_grid_multiples_x * GRID_TIGHTNESS * layer_speed);
+    var cursor_relative_position_y  = (cursor_grid_multiples_y * GRID_TIGHTNESS * layer_speed);
+
+    var new_x                       = (cursor_relative_position_x / camera_scale_x) + camera_relative_position_x;
+    var new_y                       = (cursor_relative_position_y / camera_scale_y) + camera_relative_position_y;
+
+    return {x: new_x, y: new_y};
+}
+
 ///////////////////////////////////////////////////
-//                   createLayer                 //
+//                  createLayer                  //
 // Function:                                     //
 //     Creates a Layer object and pushes it onto //
 //     the layers array.                         //
@@ -226,10 +378,84 @@ function game_findLayer(layer_name)
     );
     if (!found_layer)
     {
-        throw "Could not find layer '" + layername + "'";
+        throw "Could not find layer '" + layer_name + "'";
     }
 
     return return_value;
+}
+
+/////////////////////////////////////////
+//        game_findLayerByObject       //
+// Function:                           //
+//     Finds the layer an entity is in //
+// Return value:                       //
+//     Entity object or null           //
+/////////////////////////////////////////
+function game_findLayerByObject(entity_object_param)
+{
+    for (var layer_object_index = 0; layer_object_index < layers.length; layer_object_index++)
+    {
+        var layer_object = layers[layer_object_index];
+        for (var i = 0; i < layer_object.entlist.length; i++)
+        {
+            var entity_object = layer_object.entlist[i];
+            if (entity_object == entity_object_param)
+            {
+                return layer_object;
+            }
+        }
+    }
+    return null;
+}
+
+//////////////////////////////////////////////////
+//               game_copyPosition              //
+// Function:                                    //
+//     Copies position from sourceVector        //
+//     Deliberately avoiding copying references //
+//                                              //
+//     Requires sourceVector have members:      //
+//     {x: Number, y: Number}                   //
+// Return value:                                //
+//     None                                     //
+//////////////////////////////////////////////////
+function game_copyPosition(sourceVector)
+{
+    return {x: sourceVector.x, y: sourceVector.y};
+}
+
+///////////////////////////////////////////////////////////////
+//                   game_restorePosition                    //
+// Function:                                                 //
+//     Restores the position of an entity moved by the mouse //
+// Return value:                                             //
+//     None                                                  //
+///////////////////////////////////////////////////////////////
+function game_restoreSelectedEntityPosition(ent)
+{
+    // Restore the position if we don't move it to a new spot
+    if (selected_entity_pos != null)
+    {
+        ent.pos = game_copyPosition(selected_entity_pos);
+    }
+    
+    selected_entity_pos = null;
+}
+
+///////////////////////////////////////////////////////////////
+//              game_saveSelectedEntityPosition              //
+// Function:                                                 //
+//     Restores the position of an entity moved by the mouse //
+// Return value:                                             //
+//     None                                                  //
+///////////////////////////////////////////////////////////////
+function game_saveSelectedEntityPosition(ent)
+{
+    // Save the position before we move it
+    if (selected_entity_pos == null)
+    {
+        selected_entity_pos = game_copyPosition(ent.pos);
+    }
 }
 
 /////////////////////////////////////////////
@@ -276,6 +502,40 @@ function getTileByName(name)
         }
     }
     return return_value;
+}
+
+////////////////////////////////////////////////////////////
+//                game_insertSelectedObject               //
+// Function:                                              //
+//     Adds selected object from html to a selected layer //
+// Return value:                                          //
+//     None                                               //
+////////////////////////////////////////////////////////////
+function game_insertSelectedObject()
+{
+    //////////////////////////////////////////////////////////////////////
+    // I clicked a tile but I forgot to select which layer to put it in //
+    //////////////////////////////////////////////////////////////////////
+    if (html_selected_layer == null)
+    {
+        html_layersErrorAnimation();
+    }
+    //////////////////////////////////
+    // I clicked a tile and a layer //
+    //////////////////////////////////
+    else
+    {
+        // Remove the _span portion of the string from the html element id
+        var layer_name = html_selected_layer.id.substring(0, html_selected_layer.id.length - '_span'.length);
+
+        pushToLayer(mouseselectedentity, layer_name);
+        
+        // Duplicate the tile in case user wants to place another of the same type
+        mouseselectedentity = addTile(mouseselectedentity.pos.x, mouseselectedentity.pos.y, getTileByName(mouseselectedentity.name));
+
+        // Update the html layer info section
+        html_selectLayerElement(html_selected_layer);
+    }
 }
 
 /////////////////////////////////////////////////
@@ -432,6 +692,7 @@ function padZero(str, len)
 //////////////////////////////////////////////////////////
 //                      approach                        //
 // Function:                                            //
+//     A basic linear interpolation function.           //
 //     Approaches flgoal in fldelta steps.              //
 //     If flcurrent is within +- fldelta of the flgoal, //
 //     then the flgoal is returned                      //
@@ -452,23 +713,17 @@ function approach(flgoal, flcurrent, fldelta)
 	return flgoal;
 }
 
-/////////////////////////////////////////////////
-//                   clamp                     //
-// Function:                                   //
-//     Returns whichever value is closer to 0. //
-// Return value:                               //
-//     Number                                  //
-/////////////////////////////////////////////////
+//////////////////////////////////////////////////
+//                    clamp                     //
+// Function:                                    //
+//     Keeps curr within the number segment:    //
+//     [-clmp, clmp]                            //
+// Return value:                                //
+//     Number                                   //
+//////////////////////////////////////////////////
 function clamp(clmp, curr)
 {
-    if (clmp < 0)
-    {
-        return Math.max(clmp, curr);
-    }
-    else
-    {
-        return Math.min(clmp, curr);
-    }
+    return Math.min(Math.max(curr, -1 * clmp), clmp);
 }
 
 /////////////////////////////////////////////////////
@@ -588,10 +843,10 @@ function checkSide(a, b)
     if (!(b instanceof Entity))
         return SideEnum.ERROR;
     
-    if (a.pos.x + a.width  > b.pos.x + b.width  && a.pos.x > b.pos.x + b.width ) return SideEnum.LEFT ;
-    if (b.pos.x + b.width  > a.pos.x + a.width  && b.pos.x > a.pos.x + a.width ) return SideEnum.RIGHT;
     if (a.pos.y + a.height > b.pos.y + b.height && a.pos.y > b.pos.y + b.height) return SideEnum.DOWN ;
     if (b.pos.y + b.height > a.pos.y + a.height && b.pos.y > a.pos.y + a.height) return SideEnum.UP   ;
+    if (a.pos.x + a.width  > b.pos.x + b.width  && a.pos.x > b.pos.x + b.width ) return SideEnum.RIGHT;
+    if (b.pos.x + b.width  > a.pos.x + a.width  && b.pos.x > a.pos.x + a.width ) return SideEnum.LEFT ;
     
     return SideEnum.ERROR;
 }
@@ -660,7 +915,27 @@ function checkCollision(a, b)
     {
         return true;
     }
-    return false;   
+
+    return false;
+
+    /*var xCollide = false;
+    var yCollide = false;
+    if (    (rect1.x > rect2.x && rect1.x < rect2.x + rect2.width)
+     ||     (rect1.x + rect1.width > rect2.x && rect1.x + rect1.width < rect2.x + rect2.width))
+    {
+        xCollide = true;
+    }
+
+    if (    (rect1.y > rect2.y && rect1.y < rect2.y + rect2.height)
+     ||     (rect1.y + rect1.height > rect2.y && rect1.y + rect1.height < rect2.y + rect2.height))
+    {
+        yCollide = true;
+    }
+    if (xCollide && yCollide)
+    {
+        console.log('collidin');
+    }
+    return xCollide && yCollide;*/
 }
 
 //////////////////////////////////////////////////////////////////////////////////////

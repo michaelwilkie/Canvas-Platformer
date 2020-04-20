@@ -100,7 +100,7 @@ class Entity
                 var elem = layerobject.entlist[j];
                 if (elem == this)
                 {
-                    layerobject.entlist.splice(i, 1);
+                    layerobject.entlist.splice(j, 1);
                 }
             }
         }
@@ -120,6 +120,7 @@ class Entity
             {
                 if (width == null && height == null)
                 {
+                    
                     game_ctx.drawImage
                     (
                         this.img,                                                       /* img object                            */
@@ -157,20 +158,28 @@ class Entity
         // Other methods I've tried made the velocity oscillate on either side of 0 //
         // (resulting in jittery side to side motion).                              //
         //////////////////////////////////////////////////////////////////////////////
-        if (this.yCollide) this.vel.x = approach(0, this.vel.x, this.friction.x);
-        if (this.xCollide) this.vel.y = approach(0, this.vel.y, this.friction.y);
-
-        this.vel.x+=this.gravity.x;
-        this.vel.y+=this.gravity.y;
-
-        this.vel.x+=this.acc.x;
-        this.vel.y+=this.acc.y;
-
-        this.vel.x = clamp(this.maxvel.x, this.vel.x);
-        this.vel.y = clamp(this.maxvel.y, this.vel.y);
-
-        this.pos.x+=this.vel.x;
-        this.pos.y+=this.vel.y;
+        if (this.yCollide)
+        {
+            this.vel.x = approach(0, this.vel.x, this.friction.x * gamecore.time.delta);
+        }
+        else
+        {
+            this.vel.y+=this.gravity.y * gamecore.time.delta;
+            this.vel.y+=this.acc.y * gamecore.time.delta;
+            this.vel.y = clamp(this.maxvel.y, this.vel.y);
+            this.pos.y+=this.vel.y;
+        }
+        if (this.xCollide)
+        {
+            this.vel.y = approach(0, this.vel.y, this.friction.y * gamecore.time.delta);
+        }
+        else
+        {
+            this.vel.x+=this.gravity.x * gamecore.time.delta;
+            this.vel.x+=this.acc.x * gamecore.time.delta;
+            this.vel.x = clamp(this.maxvel.x, this.vel.x);
+            this.pos.x+=this.vel.x;
+        }
 
         this.keepInBounds();
     }
@@ -200,10 +209,6 @@ class Entity
             this.xCollide = true;
             this.pos.x = 0;
         }
-        else
-        {
-            this.xCollide = false;
-        }
         if (this.pos.y + this.height > level.height) 
         {
             this.yCollide = true;
@@ -213,10 +218,6 @@ class Entity
         {
             this.yCollide = true;
             this.pos.y = 0;
-        }
-        else
-        {
-            this.yCollide = false;
         }
     }
     resetAnim()

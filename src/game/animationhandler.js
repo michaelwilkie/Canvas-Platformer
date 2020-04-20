@@ -26,7 +26,7 @@ class AnimationHandler
         this.animations.push (new Animation(width, height, animation_index, framelist));
 
         // Add these 2 properties to the newly added element.
-        this.animations[this.animations.length - 1].associated_action  = associated_action; 
+        this.animations[this.animations.length - 1].associated_action  = associated_action;
         this.animations[this.animations.length - 1].priority           = priority         ;
     }
     //////////////////////////////////////////////////////
@@ -108,34 +108,38 @@ class AnimationHandler
     /////////////////////////////////////////////////////////////////////////////////////
     getCurrentAnimation()
     {
-        var a = null;
+        var current_animation = null;
         var bFoundNullAction = false;
+        var action = null;
         
         for (var i = 0; i < this.animations.length; i++)
         {
-            a = this.animations[i];
-            action = a.associated_action;
-            if (action != null)
+            current_animation = this.animations[i];
+            if (!current_animation.nominal)
             {
-                if (keyhandler.isPressed(a.associated_action))
+                action = current_animation.associated_action;
+                if (action != null)
                 {
-                    return a;
-                }   
-            }
-            else
-            {
-                bFoundNullAction = true;
+                    if (keyhandler.isDown(current_animation.associated_action))
+                    {
+                        return current_animation;
+                    }
+                }
+                else
+                {
+                    bFoundNullAction = true;
+                }
             }
         }
         // If I get this far, then an animation with a null associated action was found
         // Now we go through the list again to find it.
         for (var i = 0; i < this.animations.length; i++)
         {
-            a = this.animations[i];
-            action = a.associated_action;
+            current_animation = this.animations[i];
+            action = current_animation.associated_action;
             if (action == null)
             {
-                return a;
+                return current_animation;
             }
         }
         

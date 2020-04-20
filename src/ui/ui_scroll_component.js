@@ -319,7 +319,8 @@ class UI_Scroll_Component extends UI_Component
                     "rgba(10, 10, 10, 0.7)"
                 );
             }
-        }
+
+        } // end of if (this.bDrawable)
 
         // Culling function
         ui_invertedClearRect(this.x, this.y, this.width, this.height);
@@ -408,9 +409,5 @@ class UI_Scroll_Component extends UI_Component
         {
             this.selectedObject = null;
         }
-    }
-    checkForClickedUI(xoffset, yoffset)
-    {
-
     }
 }

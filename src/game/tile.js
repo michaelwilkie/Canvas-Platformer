@@ -29,8 +29,8 @@ class Tile extends Wall
             this.height, 
             this.pos.x - (camera.x * layerspeed) + camera.screenpartitionx, 
             this.pos.y - (camera.y * layerspeed) + camera.screenpartitiony, 
-            this.width, 
-            this.height
+            this.width * layerspeed,
+            this.height * layerspeed
         );
     }
     ///////////////////////////////////////////////////

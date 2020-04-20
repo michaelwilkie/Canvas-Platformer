@@ -39,10 +39,18 @@ $(document).ready(function ()
     ui_canvas   = $("#ui_canvas"  )[0]                 ;
     ui_ctx      = $("#ui_canvas"  )[0].getContext("2d");
 
+    // Initialize game-time-keeping pbject
+    gamecore.time = new GameTime();
+    gamecore.time.tick();
+
     player = addPlayer(10, 10);
 
+    // As far as I know right now, the HTML Canvas is not easily resizable
+    // so I will have them be constants for now
     SCREEN_WIDTH  = game_canvas.width ;
     SCREEN_HEIGHT = game_canvas.height;
+    //SCREEN_WIDTH = game_canvas.width = game_canvas.width * SCREEN_WIDTH_PERCENTAGE;
+    //SCREEN_HEIGHT = game_canvas.height = game_canvas.width * SCREEN_ASPECT_RATIO;
 
     // Set up player camera to follow player
     playercamera = new Camera(player);   
@@ -78,9 +86,10 @@ $(document).ready(function ()
     game_setGameMode(GAME_MODE_ENUM.EDIT_MODE);
 
     // Creating template layers so the user has an example to go from
-    html_addLayerElement(1  , "foreground1");
-    html_addLayerElement(0.5, "background1");
     html_addLayerElement(0.3, "background2");
+    html_addLayerElement(0.5, "background1");
+    html_addLayerElement(1  , "foreground1");
+
     //createLayer(1  , "foreground1"); // 1 is the default speed multiplier
     //createLayer(0.5, "background1"); // move 0.5 times as fast as the foreground
     //createLayer(0.3, "background2"); // move 0.3 times as fast as the foreground
@@ -89,12 +98,6 @@ $(document).ready(function ()
     pushToLayer(player          , "foreground1");
     pushToLayer(background_wall , "background1");    
     pushToLayer(background_wall2, "background2");
-
-    // slowest layers are drawn first so I sort in ascending order by layer speed
-    layers.sort(function(a, b)
-    {
-        return a.speed - b.speed;
-    });
 
     ui_canvas.addEventListener('wheel', function (event)
     {
@@ -119,9 +122,12 @@ $(document).ready(function ()
 
     CanvasPlatformer();
 });
+
 function CanvasPlatformer()
 {
     window.requestAnimationFrame(CanvasPlatformer);
+
+    gamecore.time.tick();
 
     game_ctx.clearRect(0,0,game_canvas.width,game_canvas.height);
     ui_ctx.clearRect  (0,0,  ui_canvas.width,  ui_canvas.height);

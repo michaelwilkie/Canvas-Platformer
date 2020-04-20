@@ -7,8 +7,6 @@
         <link href="css/style.css" rel="stylesheet" type="text/css"></link>
         <!--<link href="css/font-awesome.min.css" rel="stylesheet"></link>-->
         <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet"></link>
-        
-
     </head>
 
     <body oncontextmenu="return false;">
@@ -22,6 +20,7 @@
         <script src="src/game/key.js"               ></script> <!-- Key class                            -->
         <script src="src/game/keyboardhandler.js"   ></script> <!-- Keyboard Input Handling              -->
         <script src="src/game/game_globals.js"      ></script> <!-- Global variable definitions          -->
+        <script src="src/game/game_time.js"         ></script> <!-- Time based animation object          -->
         <script src="src/game/tables.js"            ></script> <!-- Global variables of large tables     -->
         <script src="src/game/entity.js"            ></script> <!-- Base class for almost all objects    -->
         <script src="src/game/player.js"            ></script> <!-- Basic player class                   -->
@@ -78,6 +77,7 @@
 
                 <!-- Row 2 Tileset / Display Options-->
                 <div class="row">
+
                     <!-- Column 1 - Tileset -->    
                     <div id="div_tileset"   class="column gray-area col-tileset noselect">
                         <div id="div_tileset_label" >Tileset</div> 
@@ -93,31 +93,36 @@
                             <i class="fa fa-plus-circle tooltip" onclick="html_addLayerElement(1)" title="Add layer"></i>
                         </div>
                         
-                        <div id="div_layers_scrollarea">
+                        <div id="div_layers_scrollarea"></div>
 
-                        </div> <!-- <div id="div_layers_scrollarea"> -->
                     </div> <!-- <div id="div_displayoptions"> -->
                         
                     <div id="div_other" class="gray-area col-other"></div>
+
                 </div> <!-- <div class="row"> -->
 
                 <!-- Row 1 Column 2 Row 3 Object Info -->
                 <div class="row">
 
                     <!-- Column 1 Layer Info -->
-                    <div class="gray-area col-other" style="width: 100%;">
+                    <div id="div_layer_parent" class="column gray-area" style="float: left;">
                         Layer Info
-                        <div id="div_layer_info">
+                        <div id="div_layer_info"></div>
 
-                        </div>
                     </div>
+                    
                     <!-- Column 2 Object Info-->
-                    <div id="div_object_info">
+                    <div id="div_object_info_parent" class="column gray-area noselect">
+                        Object Info
+                        <div id="div_object_info"></div>
 
-                    </div>
-                </div>
+                    </div> <!-- <div id="div_object_info_parent" class="column gray-area noselect"> -->
+
+                </div> <!-- <div class="row"> -->
+
             </div><!-- <div class="col2"> -->
-        </div>
+
+        </div> <!-- Row 1 <div class="row"> -->
 
         <!-- Row 2 -->
         <div class="row"> 

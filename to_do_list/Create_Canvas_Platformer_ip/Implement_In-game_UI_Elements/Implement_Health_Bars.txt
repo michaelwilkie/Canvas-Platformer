@@ -6,7 +6,7 @@ What death means to an entity remains to be defined
 
 +---------------------------------------+
 |                        ▓▓▓▓▓▓▓▓▓▓▓▓▓▓ |
-|                        ▓▓ BUILDING  ▓ |
+|                        ▓▓ BUILDING ▓▓ |
 |     HP                 ▓▓▓▓▓▓▓▓▓▓▓▓▓▓ |
 |  [---   ]              ▓▓   HP        |
 |      o                 || [----]      |

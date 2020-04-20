@@ -1,0 +1,16 @@
+Add buttons to shift layers above or below one another
+so that if Layer A is above Layer B then Layer A is shown on the canvas on top of Layer B
+
+
+
+        Layers ➕
+➖ LayerName1 ⬆️️️⬇️
+➖ LayerName2 ⬆️️️⬇️
+➖ LayerName3 ⬆️️️⬇️
+
+    *Clicking up arrow on Layer2*
+
+        Layers ➕
+➖ LayerName2 ⬆️️️⬇️
+➖ LayerName1 ⬆️️️⬇️
+➖ LayerName3 ⬆️️️⬇️

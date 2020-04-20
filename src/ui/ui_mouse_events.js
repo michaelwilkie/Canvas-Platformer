@@ -49,27 +49,38 @@ function ui_mouse_down(event)
             break;
         }
     }
+
     mousestartpos = getMousePos(event);
     mousepos = mousestartpos;
 
-    if (gameglobals.mode == GAME_MODE_ENUM.EDIT_MODE)
+    if (gamecore.mode == GAME_MODE_ENUM.EDIT_MODE)
     {
         ///////////////////////////////////////////////////////////////////
         // Something from the Edit Mode component was previously clicked //
         ///////////////////////////////////////////////////////////////////
-        if (html_selectedObject != null)
+        if (html_selected_object != null)
         {
             if (mdownleft)
             {
-                pushToLayer
-                (
-                    mouseselectedentity,    // entity
-                    "foreground1"           // layer name
-                );
-                mouseselectedentity = addTile(mouseselectedentity.pos.x, mouseselectedentity.pos.y, getTileByName(mouseselectedentity.name));
+                //////////////////////////////////////////////////////////////////////////////
+                // Only create a new object if it's an object selected from the tileset div //
+                //////////////////////////////////////////////////////////////////////////////
+                if (html_selected_object.parentElement == html_div_tileset)
+                {
+                    game_insertSelectedObject();
+                }
+                else
+                {
+                    html_selected_object.entity_reference.pos = game_calculateRelativeMousePosition();
+
+                    game_unselectObject();
+                }
             }
             else
             {
+                // Restore the position if we don't move it to a new spot
+                game_restoreSelectedEntityPosition(mouseselectedentity);
+
                 game_unselectObject();
             }
         }
@@ -78,78 +89,85 @@ function ui_mouse_down(event)
         /////////////////////////////////////////
         else
         {
-            var cursor_grid_multiples_x     = Math.floor(mousepos.x     / GRID_TIGHTNESS);
-            var cursor_grid_multiples_y     = Math.floor(mousepos.y     / GRID_TIGHTNESS);
-
-            var camera_grid_multiples_x     = Math.floor(playercamera.x / GRID_TIGHTNESS);
-            var camera_grid_multiples_y     = Math.floor(playercamera.y / GRID_TIGHTNESS);
-            
-            var camera_scale_x              = playercamera.zoomx;
-            var camera_scale_y              = playercamera.zoomy;
-
-            var camera_relative_position_x  = (camera_grid_multiples_x * GRID_TIGHTNESS);
-            var camera_relative_position_y  = (camera_grid_multiples_y * GRID_TIGHTNESS);
-
-            var cursor_relative_position_x  = (cursor_grid_multiples_x * GRID_TIGHTNESS);
-            var cursor_relative_position_y  = (cursor_grid_multiples_y * GRID_TIGHTNESS);
-
-            var new_x = (cursor_relative_position_x / camera_scale_x) + camera_relative_position_x;
-            var new_y = (cursor_relative_position_y / camera_scale_y) + camera_relative_position_y;
-
-            ui_mouse_events_previous_new_x = new_x;
-            ui_mouse_events_previous_new_y = new_y;
-
-            var truncated_mousepos = {x: new_x, y: new_y};
-
-            var scaled_mouse_position = {
-                x: (mousepos.x / camera_scale_x) + playercamera.x, 
-                y: (mousepos.y / camera_scale_y) + playercamera.y
-            };
-
-            if (mouseselectedentity == null)
+            if (html_selected_layer != null)
             {
-                for (var i = 0; i < entlist.length; i++)
+                var camera_scale_x  = playercamera.zoomx;
+                var camera_scale_y  = playercamera.zoomy;
+
+                var new_position    = game_calculateRelativeMousePosition();
+
+                ui_mouse_events_previous_new_x = new_position.x;
+                ui_mouse_events_previous_new_y = new_position.y;
+
+                var scaled_mouse_position = {
+                    x: (mousepos.x / camera_scale_x) + playercamera.x, 
+                    y: (mousepos.y / camera_scale_y) + playercamera.y
+                };
+
+                if (mouseselectedentity == null)
                 {
-                    ////////////////////////////////////////////
-                    // TO DO:                                 //
-                    // Add per layer click drag functionality //
-                    ////////////////////////////////////////////
-                    if (entlist[i] instanceof Tile 
-                    && checkPointCollision(entlist[i], scaled_mouse_position))
+                    for (var i = 0; i < entlist.length; i++)
                     {
-                        if (mdownleft)
+                        if (entlist[i] instanceof Tile 
+                        && checkPointCollision(entlist[i], scaled_mouse_position))
                         {
-                            mouseselectedentity = entlist[i];
-                        }
-                        else if (mdownright)
-                        {
-                            game_unselectObject();
-                        }
-                        break;
+                            if (mdownleft)
+                            {
+                                // Save the position before we move it
+                                game_saveSelectedEntityPosition(entlist[i]);
+
+                                mouseselectedentity = entlist[i];
+                            }
+                            else if (mdownright)
+                            {
+                                // Restore the position if we don't move it to a new spot
+                                game_restoreSelectedEntityPosition(entlist[i]);
+
+                                game_unselectObject();
+                            }
+                            break;
+                        } // end of if (entlist[i]...&& checkPointCollision...)
+
+                    } // end of for (entlist)
+
+                } // end of if (mouseselectedentity == null)
+
+                ///////////////////////////////////////
+                // Release a tile from being dragged //
+                ///////////////////////////////////////
+                else
+                {
+                    if (mdownleft)
+                    {
+                        mouseselectedentity.pos = new_position;
+                        mouseselectedentity = null;
+                        html_applyDefaultStyleToImg(html_selected_object);
+                        html_selected_object = null;
+                        selected_entity_pos = null;
                     }
+                    else if (mdownright)
+                    {
+                        // Restore the position if we don't move it to a new spot
+                        game_restoreSelectedEntityPosition(mouseselectedentity);
+
+                        game_unselectObject();
+                    }
+
                 }
-            }
-            ///////////////////////////////////////
-            // Release a tile from being dragged //
-            ///////////////////////////////////////
+
+            } // end of if (html_selected_layer != null)
+
+            ////////////////////////////////
+            // I forgot to select a layer //
+            ////////////////////////////////
             else
             {
-                if (mdownleft)
-                {
-                    mouseselectedentity.pos = truncated_mousepos;
-                    mouseselectedentity = null;
-                    html_applyDefaultStyleToImg(html_selectedObject);
-                    html_selectedObject = null;
-                }
-                else if (mdownright)
-                {
-                    game_unselectObject();
-                }
-
+                html_layersErrorAnimation();
             }
-        } // end if (html_selectedObject != null) else { }
+            
+        } // end if (html_selected_object != null) else { }
 
-    } // end if (gameglobals.mode == GAME_MODE_ENUM.EDIT_MODE)
+    } // end if (gamecore.mode == GAME_MODE_ENUM.EDIT_MODE)
 
 }
 
@@ -157,87 +175,27 @@ function ui_mouse_move(event)
 {
     mousepos = getMousePos(event);
 
-    if (gameglobals.mode == GAME_MODE_ENUM.EDIT_MODE)
+    if (gamecore.mode == GAME_MODE_ENUM.EDIT_MODE)
     {
-        ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        //      Snapping a selected tile to the grid lines represented by the '+' symbols:                           //
-        //                                                                                                           //
-        //      1.  Calculate how many + symbols I am from the origin (0,0)                                          //
-        //          Distance between + symbols is GRID_TIGHTNESS                                                     //
-        //          The number of + symbols from x axis is (mousepos.x / GRID_TIGHTNESS)                             //
-        //          The number of + symbols from y axis is (mousepos.y / GRID_TIGHTNESS)                             //
-        //                                                                                                           //
-        //      2.  Calculate how many + symbols the camera is from the origin (0,0)                                 //
-        //          Distance between + symbols is GRID_TIGHTNESS                                                     //
-        //          The number of + symbols from x axis is (playercamera.x / GRID_TIGHTNESS)                         //
-        //          The number of + symbols from y axis is (playercamera.y / GRID_TIGHTNESS)                         //
-        //                                                                                                           //
-        //      3.  Calculate relative position of cursor                                                            //
-        //          Cursor's relative x position: cursor_grid_multiples_x * GRID_TIGHTNESS                           //
-        //          Cursor's relative y position: cursor_grid_multiples_y * GRID_TIGHTNESS                           //
-        //                                                                                                           //
-        //      4.  Calculate relative position of camera                                                            //
-        //          Camera's relative x position: camera_grid_multiples_x * GRID_TIGHTNESS                           //
-        //          Camera's relative y position: camera_grid_multiples_y * GRID_TIGHTNESS                           //
-        //                                                                                                           //
-        //      5.  Add relative position of camera and the scaled position of cursor                                //
-        //          Resulting x position: (cursor_relative_position_x / camera_scale_x) + camera_relative_position_x //
-        //          Resulting y position: (cursor_relative_position_y / camera_scale_y) + camera_relative_position_y //
-        //      +-----------------------level---------------------------+                                            //
-        //      |   +   +   +   +   +   +   +   +   +   +   +   +   +   |                                            //
-        //      |   +   +   +   +   +   +   +   +   +   +   +   +   +   |                                            //
-        //      |   +   +   +---camera---+  +   +   +   +   +   +   +   |                                            //
-        //      |   +   +   |  o    +   +|  +   +   +   +   +   +   +   |                                            //
-        //      |   +   +   | cursor+   +|  +   +   +   +   +   +   +   |                                            //
-        //      |   +   +   |   +   +   +|  +   +   +   +   +   +   +   |                                            //
-        //      |   +   +   +------------+  +   +   +   +   +   +   +   |                                            //
-        //      |   +   +   +   +   +   +   +   +   +   +   +   +   +   |                                            //
-        //      |   +   +   +   +   +   +   +   +   +   +   +   +   +   |                                            //
-        //      |   +   +   +   +   +   +   +   +   +   +   +   +   +   |                                            //
-        //      |   +   +   +   +   +   +   +   +   +   +   +   +   +   |                                            //
-        //      |   +   +   +   +   +   +   +   +   +   +   +   +   +   |                                            //
-        //      +-------------------------------------------------------+                                            //
-        ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
         // mouseselectedentity is assigned in ui_scroll_component.js and html_func.js
         if (mouseselectedentity != null)
         {
-            var cursor_grid_multiples_x     = Math.floor(mousepos.x     / GRID_TIGHTNESS);
-            var cursor_grid_multiples_y     = Math.floor(mousepos.y     / GRID_TIGHTNESS);
-
-            var camera_grid_multiples_x     = Math.floor(playercamera.x / GRID_TIGHTNESS);
-            var camera_grid_multiples_y     = Math.floor(playercamera.y / GRID_TIGHTNESS);
+            var new_position = game_calculateRelativeMousePosition();
             
-            var camera_scale_x              = playercamera.zoomx;
-            var camera_scale_y              = playercamera.zoomy;
+            mouseselectedentity.pos.x = new_position.x;
+            mouseselectedentity.pos.y = new_position.y;
 
-            var camera_relative_position_x  = (camera_grid_multiples_x * GRID_TIGHTNESS);
-            var camera_relative_position_y  = (camera_grid_multiples_y * GRID_TIGHTNESS);
-
-            var cursor_relative_position_x  = (cursor_grid_multiples_x * GRID_TIGHTNESS);
-            var cursor_relative_position_y  = (cursor_grid_multiples_y * GRID_TIGHTNESS);
-
-            var new_x = (cursor_relative_position_x / camera_scale_x) + camera_relative_position_x;
-            var new_y = (cursor_relative_position_y / camera_scale_y) + camera_relative_position_y;
-
-            mouseselectedentity.pos.x = new_x;
-            mouseselectedentity.pos.y = new_y;
             if (mdownleft)
             {
-                if (new_x != ui_mouse_events_previous_new_x
-                 || new_y != ui_mouse_events_previous_new_y)
+                if (new_position.x != ui_mouse_events_previous_new_x
+                 || new_position.y != ui_mouse_events_previous_new_y)
                 {
-                    pushToLayer
-                    (
-                        mouseselectedentity,    // entity
-                        "foreground1"           // layer name
-                    );
-                    mouseselectedentity = addTile(mouseselectedentity.pos.x, mouseselectedentity.pos.y, getTileByName(mouseselectedentity.name));
+                    game_insertSelectedObject();
                 }
             }
 
-            ui_mouse_events_previous_new_x = new_x;
-            ui_mouse_events_previous_new_y = new_y;
+            ui_mouse_events_previous_new_x = new_position.x;
+            ui_mouse_events_previous_new_y = new_position.y;
         } // end if (mouseselectedentity != null)
         else
         {

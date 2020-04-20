@@ -84,7 +84,7 @@ function initialize_edit_mode_component()
 
     ui_edit_mode_component.update = function()
     {
-        this.draw_If_True(gameglobals.mode == GAME_MODE_ENUM.EDIT_MODE);
+        this.draw_If_True(gamecore.mode == GAME_MODE_ENUM.EDIT_MODE);
         this.component_list.forEach
         (
             function(elem)

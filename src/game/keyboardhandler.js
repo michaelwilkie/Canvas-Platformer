@@ -72,42 +72,44 @@ class KeyHandler
     }
     keyup(keycode)
     {
-        var key;
+        var key = null;
+        var log_string = "pressed: ";
+        
         if (isNaN(keycode))
         {
             key = this.getKeybyName(keycode);
-            if (DEBUG_MODE) console.log("pressed: " + key.name + " " + key.isPressed);
         }
         else
         {   
             key = this.getKeybyCode(keycode);
-            if (DEBUG_MODE) console.log("pressed: " + key.name + " " + key.isPressed);
         }
         if (key == null)
         {
             console.log("bad key: " + keycode);
             return;
         }
+        if (DEBUG_MODE) console.log(log_string + key.name + " " + key.isPressed);
         key.isPressed = false;
     }
     keydown(keycode)
     {
-        var key;
+        var key = null;
+        var log_string = "unpressed: ";
+
         if (isNaN(keycode))
         {
             key = this.getKeybyName(keycode);
-            if (DEBUG_MODE) console.log("unpressed: " + key.name + " " + key.isPressed);
         }
         else
         {   
             key = this.getKeybyCode(keycode);
-            if (DEBUG_MODE) console.log("unpressed: " + key.name + " " + key.isPressed);
         }
         if (key == null)
         {
             console.log("bad key: " + keycode);
             return;
         }
+        if (DEBUG_MODE) console.log(log_string + key.name + " " + key.isPressed);
         key.isPressed = true;
     }
     updateLastKeypress()

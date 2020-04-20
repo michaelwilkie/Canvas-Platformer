@@ -90,7 +90,6 @@ function ui_setFillColor(color)
 //////////////////////////////////////////////////////////////////////////////////////////
 function ui_drawText(text, x, y, color, alignment="center", font, fontsize)
 {
-    if (DEBUG_MODE)  console.log(getFont(font, fontsize));
     ui_ctx.font         = ui_getFont(font, fontsize);
     ui_ctx.fillStyle    = color;
     ui_ctx.textAlign    = alignment;

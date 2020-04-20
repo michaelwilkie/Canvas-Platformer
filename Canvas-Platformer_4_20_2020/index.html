@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <link rel="stylesheet" href="css/w3.css"></link>
+        <script src="src/jquery.min.js"></script>
+        <title>Canvas Platformer</title>
+        <link href="css/style.css" rel="stylesheet" type="text/css"></link>
+        <!--<link href="css/font-awesome.min.css" rel="stylesheet"></link>-->
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet"></link>
+        
+
+    </head>
+
+    <body oncontextmenu="return false;">
+        <script src="src/game/game_func.js"         ></script> <!-- Game loop and other useful functions -->
+        <script src="src/game/animationhandler.js"  ></script> <!-- Animation list operation handling    -->
+        <script src="src/game/animation.js"         ></script> <!-- Sprite animation handling            -->
+        <script src="src/game/tileset_info.js"      ></script> <!-- Tileset table                        -->
+        <script src="src/game/layer.js"             ></script> <!-- Layer class, manages drawing         -->
+        <script src="src/game/level.js"             ></script> <!-- Level class                          -->
+        <script src="src/game/camera.js"            ></script> <!-- Camera object class                  -->
+        <script src="src/game/key.js"               ></script> <!-- Key class                            -->
+        <script src="src/game/keyboardhandler.js"   ></script> <!-- Keyboard Input Handling              -->
+        <script src="src/game/game_globals.js"      ></script> <!-- Global variable definitions          -->
+        <script src="src/game/tables.js"            ></script> <!-- Global variables of large tables     -->
+        <script src="src/game/entity.js"            ></script> <!-- Base class for almost all objects    -->
+        <script src="src/game/player.js"            ></script> <!-- Basic player class                   -->
+        <script src="src/game/puck.js"              ></script> <!-- Old bouncy ball class, may repurpose -->
+        <script src="src/game/wall.js"              ></script> <!-- Wall with basic collision detection  -->
+        <script src="src/game/trigger.js"           ></script> <!-- Subclass of Wall that causes events  -->
+        <script src="src/game/goal.js"              ></script> <!-- Subclass of trigger, may repurpose   -->
+        <script src="src/game/scoreboard.js"        ></script> <!-- Display informational text to player -->
+        <script src="src/game/tile.js"              ></script> <!-- Interface to Wall, saves resources   -->
+        <script src="src/game/particle.js"          ></script> <!-- Basic particle fx class              -->
+
+        <script src="src/html/html_initialize.js"   ></script> <!-- Populate HTML section with tileset   -->
+        <script src="src/html/html_globals.js"      ></script> <!-- HTML related global variables        -->
+        <script src="src/html/html_func.js"         ></script> <!-- Functions that modify the HTML       -->
+
+        <script src="src/ui/ui_component.js"        ></script> <!-- Generic class for UI                 -->
+        <script src="src/ui/ui_scroll_component.js" ></script> <!-- UI Scroll component for scrolling    -->
+        <script src="src/ui/ui_globals.js"          ></script> <!-- Global variable definitions for UI   -->
+        <script src="src/ui/ui_func.js"             ></script> <!-- Common functions for UI              -->
+        <script src="src/ui/ui_menu.js"             ></script> <!-- Base class for Menus                 -->
+        <script src="src/ui/ui_label.js"            ></script> <!-- Label class for basic UI components  -->
+        <script src="src/ui/ui_menuitem.js"         ></script> <!-- Base class for MenuItems             -->
+        <script src="src/ui/ui_edit_mode.js"        ></script> <!-- User interface for the level editor  -->
+        <script src="src/ui/ui_mouse_events.js"     ></script> <!-- Mouse events for UI Canvas           -->
+        <script src="src/ui/ui_button.js"           ></script> <!-- Button for UI elements               -->
+        <script src="src/initialize.js"             ></script> <!-- Initialization of game objects       -->
+
+        <!-- Row 1 -->
+        <div class="row">
+
+            <!-- Row 1 Column 1 -->
+            <div id="col1" class="column">
+                <div class="wrapper">
+                    <canvas id="game_canvas" crossOrigin="anonymous" width="1200" height="800">
+                        Canvas not supported by your browser
+                    </canvas>
+                    <canvas id="ui_canvas" width="1200" height="800">
+                        Canvas not supported by your browser
+                    </canvas>
+                </div>
+                <div>
+                    <!-- Precaching the image so the tileset can be loaded in the 2nd column correctly -->
+                    <img id="tileset_html_img" src="materials/surt_generic_platformer_tiles.png" hidden></img>
+                </div>
+            </div>
+
+            <!-- Row 1 Column 2 Edit Mode / Miscellaneous controls -->
+            <div id="col2" class="column">
+
+                <!-- Row 1 Edit Mode -->
+                <div class="row">
+                    <div id="div_edit_mode" class="col-mode noselect" onclick="game_transitionMode()">Edit Mode</div>
+                </div>
+
+                <!-- Row 2 Tileset / Display Options-->
+                <div class="row">
+                    <!-- Column 1 - Tileset -->    
+                    <div id="div_tileset"   class="column gray-area col-tileset noselect">
+                        <div id="div_tileset_label" >Tileset</div> 
+                    </div>
+                    
+                    <!-- Column 2 - Dislpay Options -->
+                    <div id="div_displayoptions" class="column noselect gray-area col-displayoptions">
+
+                        <div id="div_displayoptions_label">Display Options</div>
+
+                        <div id="div_layers" class="noselect">
+                            Layers
+                            <i class="fa fa-plus-circle tooltip" onclick="html_addLayerElement(1)" title="Add layer"></i>
+                        </div>
+                        
+                        <div id="div_layers_scrollarea">
+
+                        </div> <!-- <div id="div_layers_scrollarea"> -->
+                    </div> <!-- <div id="div_displayoptions"> -->
+                        
+                    <div id="div_other" class="gray-area col-other"></div>
+                </div> <!-- <div class="row"> -->
+
+                <!-- Row 1 Column 2 Row 3 Object Info -->
+                <div class="row">
+
+                    <!-- Column 1 Layer Info -->
+                    <div class="gray-area col-other" style="width: 100%;">
+                        Layer Info
+                        <div id="div_layer_info">
+
+                        </div>
+                    </div>
+                    <!-- Column 2 Object Info-->
+                    <div id="div_object_info">
+
+                    </div>
+                </div>
+            </div><!-- <div class="col2"> -->
+        </div>
+
+        <!-- Row 2 -->
+        <div class="row"> 
+            <div id="div_author">
+                Canvas Platformer by Michael Wilkie
+            </div>
+        </div>
+    </body>
+</html>

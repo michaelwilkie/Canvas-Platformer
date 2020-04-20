@@ -16,8 +16,11 @@ class Animation
         this.animation_index    = animation_index   ; // integer indicating which row (in a sprite table) will be animated
         this.frame              = 0                 ; // the current frame to be shown
         this.animfinished       = false             ; // boolean determining whether the animation has finished
-        this.animation_rate     = 2                 ; // the number of pseudoframes per actual frame
-        this.updateframe        = 0                 ; // to help slow down the rate of an animation
+        this.updatetimer        = gamecore.animation_timer; // seconds between each frame
+        this.next_animation_time= gamecore.time.now ; // to help slow down the rate of an animation
+        this.associated_action  = null              ; // Key associated with the animation, to be set by AnimationHandler
+        this.priority           = null              ; // Used to assist in ordering within an AnimationHandler
+        this.nominal            = false             ; // Used to give custom animation actions that don't rely on key names
     }
     
     /////////////////////////////////////////////////
@@ -34,6 +37,23 @@ class Animation
         this.animation_rate = animation_rate;
     }
 
+    //////////////////////////////////////////////
+    //              setActionNominal            //
+    // Function:                                //
+    //     Sets the this.nominal variable       //
+    //     If an animation's action is nominal, //
+    //     that means its 'action' is not the   //
+    //     name of the key on your keyboard     //
+    //     but rather just text for the sake    //
+    //     of convenience.                      //
+    //                                          //
+    // Return value:                            //
+    //     None                                 //
+    //////////////////////////////////////////////
+    setActionNominal(bNominal)
+    {
+        this.nominal = bNominal
+    }
     /////////////////////////////////////////////////////////////////////
     //                            rewind                               //
     // Function:                                                       //
@@ -45,15 +65,13 @@ class Animation
     rewind()
     {
         this.animfinished = false;
-        this.frame = this.framelist[0];
+        this.frame = 0;
     }
 
     ////////////////////////////////////////////////////////////////////
     //                            update                              //
     // Function:                                                      //
-    //     Advances the animation by 1 pseudoframe.                   //
-    //     Pseudoframe is just the operations between an actual frame //
-    //     advancement.                                               //
+    //     Advances the animation by 1 frame per this.updatetimer     //
     //                                                                //
     //     If a frame reaches the last frame in the sequence then     //
     //     this.animfinished will be set to true and this.frame will  //
@@ -65,7 +83,6 @@ class Animation
     {
         if (!this.animfinished)
         {
-            this.updateframe++;
             if (this.framelist != null)
             {
                 if (this.frame == this.framelist.length - 1)
@@ -73,10 +90,10 @@ class Animation
                     this.animfinished = true;
                 }
             }
-            if (this.updateframe > this.animationRate)
+            if (gamecore.time.now > this.next_animation_time + this.updatetimer)
             {
                 this.frame++;
-                this.updateframe = 0;
+                this.next_animation_time = gamecore.time.now + this.updatetimer;
             }
         }
         else

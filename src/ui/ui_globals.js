@@ -29,5 +29,7 @@ var ui_ctx;
 var ui_scrollbar_width  = 16; 
 var ui_scrollbar_height = 16;
 
-var SCREEN_WIDTH;
-var SCREEN_HEIGHT;
+var SCREEN_WIDTH            = 1200  ;
+var SCREEN_HEIGHT           = 800   ;
+var SCREEN_ASPECT_RATIO     = 5/4   ;
+var SCREEN_WIDTH_PERCENTAGE = 0.75  ; // out of 1.0

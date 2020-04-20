@@ -47,7 +47,19 @@ body, html
     100%    { background-color: green   };
 }
 
+@keyframes green_to_red 
+{
+    0%      { background-color: red     };
+    100%    { background-color: transparent   };
+}
+
 .error-select
+{
+    animation-name: green_to_red;
+    animation-duration: 1s;
+}
+
+.error-select2
 {
     animation-name: green_to_red;
     animation-duration: 1s;
@@ -79,6 +91,18 @@ body, html
         -ms-user-select: none; /* Internet Explorer/Edge */
             user-select: none; /* Non-prefixed version, currently
                                   supported by Chrome and Opera */
+}
+
+.redborder
+{
+    border: 2px solid red;
+    border-radius: 5px;
+}
+
+.selected-layer
+{
+    color: black;
+    background-color:white;
 }
 
 /* *************************** Column 1 Elements *************************** */
@@ -114,11 +138,11 @@ body, html
 
 .column 
 {
-    /*border       : 2px dotted yellow;*/
-    border-radius: 5px                ;
-    margin: 5px                       ;
-    width: 100%;
-    font-size: 20px;
+    /*border        : 2px dotted yellow;*/
+    border-radius   : 5px               ;
+    margin          : 5px               ;
+    width           : 100%              ;
+    font-size       : 20px              ;
 }
 
 
@@ -150,9 +174,11 @@ img .selected
 /* *************************** Layer Elements *************************** */
 input
 {
-    background  : transparent;
-    border      : none;
-    color       : white;
+    background      : transparent;
+    border          : 2px solid gray;
+    border-radius   : 5px;
+    color           : inherit; /* text color is expected to change so it is inherited */
+    width           : 75%;
 }
 input:hover
 {
@@ -167,7 +193,6 @@ i
     /*filter: brightness(150%);*/
     cursor: pointer;
 }
-
 /* *************************** Column 2 ********************************** */
 #col2
 {
@@ -190,7 +215,7 @@ i
 /* cursors: https://www.w3schools.com/cssref/playit.asp?filename=playcss_cursor&preval=alias */
 #div_edit_mode
 {
-    background: green;
+    background: dodgerblue;
     /*display: table;*/
     width: 100%;
     margin: 5px;
@@ -201,6 +226,18 @@ i
 {
     filter: brightness(150%);
     cursor: pointer;
+}
+
+#div_object_info
+{
+    float:  left;
+    margin: 5px;
+}
+
+#div_layer_parent
+{
+    float: left;
+    margin: 5px;
 }
 
 img:hover

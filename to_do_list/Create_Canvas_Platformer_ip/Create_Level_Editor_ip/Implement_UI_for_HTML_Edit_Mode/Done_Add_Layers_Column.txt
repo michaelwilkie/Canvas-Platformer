@@ -1,0 +1,15 @@
+Add representation of Layer objects into the div_layers_scrollarea element
+
+Should be able to remove, rename, and add layers.
+Find icons to use as buttons to provide and interface for this functionality
+
+        Tileset                     Layers ➕
+[] [] [] [] [] [] [] []     ➖   LayerName1
+[] [] [] [] [] [] [] []     ➖   LayerName2
+[] [] [] [] [] [] [] []     ➖   LayerName3
+[] [] [] [] [] [] [] []     ➖   LayerName4
+[] [] [] [] [] [] [] []
+[] [] [] [] [] [] [] []
+
+Where ➖ is remove layer
+and ➕ is add layer
