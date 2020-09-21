@@ -53,11 +53,28 @@ class Layer
         {
             if (this.entlist[i] == e)
             {
-                removed = e;
                 this.entlist.splice(i, 1);
                 e.killSelf();
                 return;
             }
         }
+    }
+    ////////////////////////////////////////////////////////////////////////////
+    //                              toString                                  //
+    // Function:                                                              //
+    //     Converts the object to a string format to help with saving/loading //
+    // Return value:                                                          //
+    //     String                                                             //
+    ////////////////////////////////////////////////////////////////////////////
+    toString()
+    {
+        // I won't save the individual entities in its entlist since the global entlist will already
+        // be taken care of
+        var str_result = "";
+
+        str_result += "name"  + " " + this.name  + "\n";
+        str_result += "speed" + " " + this.speed + "\n";
+
+        return str_result;
     }
 }

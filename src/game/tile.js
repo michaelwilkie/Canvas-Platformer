@@ -13,10 +13,17 @@ class Tile extends Wall
     constructor(x, y, w, h, framelist, xoffset, yoffset, img, name)
     {
         super(x, y, w, h, null, framelist);
-        this.name = name;
-        this.xoffset = xoffset; // offset position for the tileset
-        this.yoffset = yoffset; // offset position for the tileset
-        this.img = img;
+        this.name       = name;     // [String ]
+        this.xoffset    = xoffset;  // [Integer] offset position for the tileset
+        this.yoffset    = yoffset;  // [Integer] offset position for the tileset
+        this.img        = img;      // [Image  ]
+    }
+    initialize(xoffset, yoffset, img, name)
+    {
+        this.xoffset    = xoffset;
+        this.yoffset    = yoffset;
+        this.img        = img;
+        this.name       = name;
     }
     draw(camera, layerspeed=1)
     {
@@ -50,5 +57,18 @@ class Tile extends Wall
             this.width, 
             this.height
         );
+    }
+    toString()
+    {
+        var str_result = "";
+
+        str_result += "xoffset" + " " + this.xoffset    + "\n";
+        str_result += "yoffset" + " " + this.yoffset    + "\n";
+
+        str_result += "name"    + " " + this.name       + "\n";
+
+        str_result += super.toString();
+
+        return str_result;
     }
 }

@@ -14,9 +14,9 @@ class Level
 {
     constructor(src)
     {
-        this.width = 0;
-        this.height = 0;
-        this.bg_img = null;
+        this.width  = 0     ; // [pixels] width  of the level (for a camera with 1:1 zoom)
+        this.height = 0     ; // [pixels] height of the level (for a camera with 1:1 zoom)
+        this.bg_img = null  ; // [image ] background image object
         if (src != null)
         {
             this.bg_img = new Image();
@@ -54,12 +54,38 @@ class Level
     {
         if (this.bg_img != null)
         {
-            game_ctx.drawImage(this.bg_img,
-                          camera.x               , camera.y               ,
-                          camera.width           , camera.height          ,
-                          camera.screenpartitionx, camera.screenpartitiony,
-                          camera.width           , camera.height
-                         );
+            game_ctx.drawImage
+            (
+                this.bg_img,
+                camera.x               , camera.y               ,
+                camera.width           , camera.height          ,
+                camera.screenpartitionx, camera.screenpartitiony,
+                camera.width           , camera.height
+            );
         }
+    }
+    ////////////////////////////////////////////////////////////////////////////
+    //                              toString                                  //
+    // Function:                                                              //
+    //     Converts the object to a string format to help with saving/loading //
+    // Return value:                                                          //
+    //     String                                                             //
+    ////////////////////////////////////////////////////////////////////////////
+    toString()
+    {
+        // I won't save the individual entities in its entlist since the global entlist will already
+        // be taken care of
+        var str_result = "";
+
+        str_result += "width"  + " " + this.width       + "\n";
+        str_result += "height" + " " + this.height      + "\n";
+
+        // Saving the source since that's all that's needed to load the image
+        if (this.bg_img != null)
+        {
+            str_result += "bg_img" + " " + this.bg_img.src  + "\n";
+        }
+
+        return str_result;
     }
 }

@@ -1,0 +1,25 @@
+Levels should be able to be saved on disk or any storage device
+
+The basic properties of a level:
+name
+width
+height
+background image
+list of entity spawns
+
+Levels will be saved as text files
+This may be suboptimal from a memory-saving perspective but memory is much more
+    available these days
+
+                ##########################################
+                ## Make sure to account for layer index ##
+                ##########################################
+
+Level (example):
+    test_level.txt:
+        Level "media/my_background.png" 1000 1000
+        wall 20 20 40 50
+        player 40 50
+
+This example level contains a level with a background my_background.png whose level size is 1000 width and 1000 height
+and a wall at (20,20) with 40 width and 50 height

@@ -3,4 +3,4 @@ and all its associated ui elements from the component list
 (if it ever gets put into the component list)
 
 A dying animation is optional but should be played if
-the entity is is a player-like class (can move around and jump and stuff)
+the entity is a player-like class (can move around and jump and stuff)

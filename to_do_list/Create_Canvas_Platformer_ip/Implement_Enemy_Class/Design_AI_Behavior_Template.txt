@@ -1,0 +1,25 @@
+Come up with a generic design for how AI will behave.
+
+Since this will be an on-board AI, all agents will be rule-based.
+I can base it off half-life's schedule system.
+
+List of actions:
+    action A
+    action B
+    action C
+    action D
+    action E
+    ...
+
+List of states:
+    State 1
+    State 2
+    State 3
+    State 4
+    State 5
+    ...
+
+Perceive-Think-Act loop:
+The current state and percepts prompt the action
+    actions are scheduled,
+    and actions transition states.

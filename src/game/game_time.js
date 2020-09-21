@@ -21,7 +21,7 @@ class GameTime
     tick()
     {
         this.now    = Date.now();
-        this.delta  = (this.now - this.then) / 1000; // seconds since last frame
+        this.delta  = (this.now - this.then) / 1000; // [seconds] time since last frame
         this.then   = this.now;
     }
     timeToUpdate()

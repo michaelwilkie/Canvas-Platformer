@@ -4,7 +4,7 @@
 /////////////////////////////////////////////////////////
 "use strict";
 
-var ui_edit_mode_component;
+// var ui_edit_mode_component;
 
 function initialize_edit_mode_component()
 {

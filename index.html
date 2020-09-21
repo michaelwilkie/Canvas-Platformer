@@ -1,8 +1,10 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html>
     <head>
         <link rel="stylesheet" href="css/w3.css"></link>
-        <script src="src/jquery.min.js"></script>
+        <script src="src/library/jquery.min.js"></script>
+        <script src="src/library/createjs.min.js"></script>
+        <script src="src/library/soundjs-0.6.2.min.js"></script>
         <title>Canvas Platformer</title>
         <link href="css/style.css" rel="stylesheet" type="text/css"></link>
         <!--<link href="css/font-awesome.min.css" rel="stylesheet"></link>-->
@@ -10,6 +12,10 @@
     </head>
 
     <body oncontextmenu="return false;">
+        <script src="src/image/image_globals.js"    ></script> <!-- Global variables for image objects   -->
+        <script src="src/image/image_data.js"       ></script> <!-- Storing image file location info     -->
+        <script src="src/image/image_func.js"       ></script> <!-- Useful functions for images          -->
+        
         <script src="src/game/game_func.js"         ></script> <!-- Game loop and other useful functions -->
         <script src="src/game/animationhandler.js"  ></script> <!-- Animation list operation handling    -->
         <script src="src/game/animation.js"         ></script> <!-- Sprite animation handling            -->
@@ -32,6 +38,10 @@
         <script src="src/game/tile.js"              ></script> <!-- Interface to Wall, saves resources   -->
         <script src="src/game/particle.js"          ></script> <!-- Basic particle fx class              -->
 
+        <script src="src/sound/sound_globals.js"    ></script> <!-- Global variables for sound objects   -->
+        <script src="src/sound/sound_data.js"       ></script> <!-- Storing sound file location info     -->
+        <script src="src/sound/sound_func.js"       ></script> <!-- Useful functions for sounds          -->
+
         <script src="src/html/html_initialize.js"   ></script> <!-- Populate HTML section with tileset   -->
         <script src="src/html/html_globals.js"      ></script> <!-- HTML related global variables        -->
         <script src="src/html/html_func.js"         ></script> <!-- Functions that modify the HTML       -->
@@ -46,7 +56,28 @@
         <script src="src/ui/ui_edit_mode.js"        ></script> <!-- User interface for the level editor  -->
         <script src="src/ui/ui_mouse_events.js"     ></script> <!-- Mouse events for UI Canvas           -->
         <script src="src/ui/ui_button.js"           ></script> <!-- Button for UI elements               -->
+        
         <script src="src/initialize.js"             ></script> <!-- Initialization of game objects       -->
+
+        <!-- Level Saving/Loading popup -->
+        <div class="popup" id="div_level_saveload_popup">
+            <h1><center>Saving and Loading</center></h1>
+            <table>                
+                <tr>
+                    <!-- Column Sizes -->
+                    <th style="width:10%"></th>
+                    <th style="width:90%">Level data is automatically pasted below</th>
+                </tr>
+                <tr>
+                    <td style="background-color: darkslategrey">Level Data:</td>
+                    <td><textarea id="html_leveldata_textarea"></textarea></td>
+                </tr>
+                <tr>
+                    <td><button class="button" id="button_close_saveload_popup">Close</button></td>
+                    <td><button class="button" id="button_load_level_popup">Load</button></td>                    
+                </tr>
+            </table>
+        </div>
 
         <!-- Row 1 -->
         <div class="row">
@@ -62,8 +93,9 @@
                     </canvas>
                 </div>
                 <div>
-                    <!-- Precaching the image so the tileset can be loaded in the 2nd column correctly -->
+                    <!-- Precaching the image so the tab content can be loaded in the 2nd column correctly -->
                     <img id="tileset_html_img" src="materials/surt_generic_platformer_tiles.png" hidden></img>
+                    <img id="player_html_img" src="materials/player/stick_figure_sprite_sheet.png" hidden></img>
                 </div>
             </div>
 
@@ -72,18 +104,33 @@
 
                 <!-- Row 1 Edit Mode -->
                 <div class="row">
-                    <div id="div_edit_mode" class="col-mode noselect" onclick="game_transitionMode()">Edit Mode</div>
+                    <div id="div_edit_mode" class="col-mode noselect button" onclick="game_transitionMode()">Edit Mode</div>
                 </div>
 
                 <!-- Row 2 Tileset / Display Options-->
                 <div class="row">
 
                     <!-- Column 1 - Tileset -->    
-                    <div id="div_tileset"   class="column gray-area col-tileset noselect">
-                        <div id="div_tileset_label" >Tileset</div> 
-                    </div>
+                    <!-- TO DO:     ADD ANOTHER TAB FOR TRIGGER ENTITIES, PLAYERS, ENEMIES, ETC... -->
                     
-                    <!-- Column 2 - Dislpay Options -->
+                        <div id="div_entities_parent" class="column gray-area col-entities">
+                            
+                            <!-- All labels will be in the 1st row -->
+                            <div id="div_entities_row1" class="row">
+                                <div id="div_tileset_label"  class="tab-selected column noselect" onclick="html_tilesetTabClick()" >Tileset </div>
+                                <div id="div_entities_label" class="tab column noselect" onclick="html_entitiesTabClick()">Entities</div>
+                            </div> <!-- <div id="div_entities_row1" class="row"> -->
+
+                            <!-- All tab content will be in the 2nd row -->
+                            <div id="div_entities_row2" class="row">
+                                <div id="div_tileset" class="noselect"></div>
+                                <!-- The tileset tab will be selected by default -->
+                                <div id="div_entities" class="noselect" style="display: hidden;"></div>
+                            </div>
+                        </div> <!-- <div id="div_entities" class="column gray-area col-entities"> -->
+                    
+                        
+                    <!-- Column 2 - Display Options -->
                     <div id="div_displayoptions" class="column noselect gray-area col-displayoptions">
 
                         <div id="div_displayoptions_label">Display Options</div>
@@ -101,11 +148,34 @@
 
                 </div> <!-- <div class="row"> -->
 
-                <!-- Row 1 Column 2 Row 3 Object Info -->
+                <!-- Row 1 Column 2 Row 3 Level Settings -->
+                <div class="row">
+
+                    <div id="div_level_settings_parent" class="column gray-area noselect">
+                        Level Settings
+
+                        <div class="row">
+                            <div id="div_level_settings" class="column" style="display: inline;">
+                                <label>Level width : </label><input id="html_level_width_input"  type="text" spellcheck="false" style="width: 50%;"></input>
+                                <label>Level height: </label><input id="html_level_height_input" type="text" spellcheck="false" style="width: 50%;"></input>
+                            </div>
+                            <button id="div_level_settings_button" class="column button" onclick="html_updateLevelDimensions()">Submit</button>
+                        </div>
+                        <div class="row">
+                            <button id="div_level_saveload_button" class="column button">Save/Load Level</button>
+                        </div>
+                        <div class="row">
+                            <div class="column">
+                                <label>Background Color:</label><input id="html_sky_color_input" type="color" value"skyblue" style="width: 50%;"></input>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Row 1 Column 2 Row 3 Layer/Object Info -->
                 <div class="row">
 
                     <!-- Column 1 Layer Info -->
-                    <div id="div_layer_parent" class="column gray-area" style="float: left;">
+                    <div id="div_layer_parent" class="column gray-area noselect" style="float: left;">
                         Layer Info
                         <div id="div_layer_info"></div>
 

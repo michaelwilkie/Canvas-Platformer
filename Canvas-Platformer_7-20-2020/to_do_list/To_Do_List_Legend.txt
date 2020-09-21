@@ -1,0 +1,7 @@
+If a file ends with   '_ip.txt' it is 'In Progress'
+If a file starts with 'x'       it is 'Cancelled'
+If a file starts with 'Done_'   it is 'Completed'
+
+If a folder ends with '_ip.txt' at least one item inside the folder is 'In Progress'
+If a folder starts with 'x'     all the items inside the folder are 'Cancelled'
+If a folder starts with 'Done_' all the items inside the folder are 'Completed'

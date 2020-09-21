@@ -1,26 +1,24 @@
 ////////////////////////////////////////////////////////////////
 // ui_mouse_events.js                                         //
 //     Contains the functions used for mouse interaction with //
-//     the ui canvas.                                         //
+//     the game canvas.                                       //
 ////////////////////////////////////////////////////////////////
 "use strict";
 
 var ui_mouse_events_previous_new_x = 0;
 var ui_mouse_events_previous_new_y = 0;
 
+var MOUSE_CLICK_ENUM = {
+    LEFT: 1,
+    MIDDLE: 2,
+    RIGHT: 3
+};
+
 function ui_mouse_wheel(event)
 {
     mwheel = true;
-    if (event.deltaY < 0)
-    {
-        mwheelup = true;
-        mwheeldown = false;
-    }
-    else
-    {
-        mwheeldown = true;
-        mwheelup = false;
-    }
+    if (event.deltaY < 0) { mwheeldown = false; mwheelup = true ; }
+    else                  { mwheeldown = true ; mwheelup = false; }
 }
 
 function ui_mouse_down(event)
@@ -29,21 +27,19 @@ function ui_mouse_down(event)
 
     switch(event.which)
     {
-        case 1:
+        case MOUSE_CLICK_ENUM.LEFT:
         {
-            // left click
             mdownleft = true;
             console.log("leftity clickity");
             break;
         }
-        case 2:
+        case MOUSE_CLICK_ENUM.MIDDLE:
         {
-            // middle click
+            // No functionality for middle click yet
             break;
         }
-        case 3:
+        case MOUSE_CLICK_ENUM.RIGHT:
         {
-            // right click
             mdownright = true;
             console.log("rightity clockity");
             break;
@@ -64,8 +60,10 @@ function ui_mouse_down(event)
             {
                 //////////////////////////////////////////////////////////////////////////////
                 // Only create a new object if it's an object selected from the tileset div //
+                // or the entities div                                                      //
                 //////////////////////////////////////////////////////////////////////////////
-                if (html_selected_object.parentElement == html_div_tileset)
+                if (html_selected_object.parentElement == html_div_tileset
+                 || html_selected_object.parentElement == html_div_entities)
                 {
                     game_insertSelectedObject();
                 }
@@ -91,6 +89,7 @@ function ui_mouse_down(event)
         {
             if (html_selected_layer != null)
             {
+                // Find where my mouse click was in the game canvas
                 var camera_scale_x  = playercamera.zoomx;
                 var camera_scale_y  = playercamera.zoomy;
 
@@ -99,34 +98,51 @@ function ui_mouse_down(event)
                 ui_mouse_events_previous_new_x = new_position.x;
                 ui_mouse_events_previous_new_y = new_position.y;
 
+                // Adjust for camera position and camera zoom scale
                 var scaled_mouse_position = {
                     x: (mousepos.x / camera_scale_x) + playercamera.x, 
                     y: (mousepos.y / camera_scale_y) + playercamera.y
                 };
 
+                /////////////////////////////////////////////
+                // If I haven't already selected something //
+                /////////////////////////////////////////////
                 if (mouseselectedentity == null)
                 {
+                    ///////////////////////////////
+                    // Which entity did I click? //
+                    ///////////////////////////////
                     for (var i = 0; i < entlist.length; i++)
                     {
-                        if (entlist[i] instanceof Tile 
-                        && checkPointCollision(entlist[i], scaled_mouse_position))
+                        ////////////////////////////////////////////////////////////////////
+                        // If I actually clicked something, and it's in the same layer as //
+                        // the one I clicked on the html                                  //
+                        ////////////////////////////////////////////////////////////////////
+                        if (game_isEntityInSelectedLayer(entlist[i]))
                         {
-                            if (mdownleft)
+                            if (checkPointCollision(entlist[i], scaled_mouse_position))
                             {
-                                // Save the position before we move it
-                                game_saveSelectedEntityPosition(entlist[i]);
+                                if (mdownleft)
+                                {
+                                    // Save the position before we move it
+                                    game_saveSelectedEntityPosition(entlist[i]);
 
-                                mouseselectedentity = entlist[i];
-                            }
-                            else if (mdownright)
-                            {
-                                // Restore the position if we don't move it to a new spot
-                                game_restoreSelectedEntityPosition(entlist[i]);
+                                    // Attach it to my mouse
+                                    mouseselectedentity = entlist[i];
+                                }
+                                else if (mdownright)
+                                {
+                                    // Restore the position if we don't move it to a new spot
+                                    game_restoreSelectedEntityPosition(entlist[i]);
 
-                                game_unselectObject();
-                            }
-                            break;
-                        } // end of if (entlist[i]...&& checkPointCollision...)
+                                    // Release it from my mouse
+                                    game_unselectObject();
+                                }
+                                break;
+
+                            } // end of if (checkPointCollision(entlist[i], scaled_mouse_position))
+
+                        } // end of if (game_isEntityInSelectedLayer(entlist[i]))
 
                     } // end of for (entlist)
 
@@ -140,10 +156,8 @@ function ui_mouse_down(event)
                     if (mdownleft)
                     {
                         mouseselectedentity.pos = new_position;
-                        mouseselectedentity = null;
-                        html_applyDefaultStyleToImg(html_selected_object);
-                        html_selected_object = null;
-                        selected_entity_pos = null;
+
+                        game_unselectObject();
                     }
                     else if (mdownright)
                     {
@@ -152,8 +166,7 @@ function ui_mouse_down(event)
 
                         game_unselectObject();
                     }
-
-                }
+                } // end of else (of if (mouseselectedentity == null) )
 
             } // end of if (html_selected_layer != null)
 
@@ -169,7 +182,7 @@ function ui_mouse_down(event)
 
     } // end if (gamecore.mode == GAME_MODE_ENUM.EDIT_MODE)
 
-}
+} // end of ui_mouse_down(event)
 
 function ui_mouse_move(event)
 {
@@ -185,7 +198,7 @@ function ui_mouse_move(event)
             mouseselectedentity.pos.x = new_position.x;
             mouseselectedentity.pos.y = new_position.y;
 
-            if (mdownleft)
+            if (mdownleft && mouseselectedentity instanceof Tile)
             {
                 if (new_position.x != ui_mouse_events_previous_new_x
                  || new_position.y != ui_mouse_events_previous_new_y)
@@ -203,7 +216,8 @@ function ui_mouse_move(event)
                             w: mousepos.x      -  mousestartpos.x, h: mousepos.y      - mousestartpos.y};
         }
     } // end if (gameglobals.mode == GAME_MODE_ENUM.EDIT_MODE)
-}
+
+} // end of ui_mouse_move(event)
 
 function ui_mouse_up(event)
 {

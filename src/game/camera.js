@@ -17,23 +17,27 @@ class Camera
     // fields defined for Camera to work properly
     constructor(followme=null)
     {
-        this.followme = followme;
-        this.width            = 0  ;
-        this.height           = 0  ;
-        this.x                = 0  ;
-        this.y                = 0  ;
-        this.screenpartitionx = 0  ;
-        this.screenpartitiony = 0  ;
-        this.dx               = 5.5;
-        this.dy               = 5.5;
-        this.zoomx            = 1  ;
-        this.zoomy            = 1  ;
+        this.followme         = followme; // [object ] object the camera follows in its update function
+        this.width            = 0       ; // [pixels ] width  of camera in pixels (for a canvas with 1:1 zoom)
+        this.height           = 0       ; // [pixels ] height of camera in pixels (for a canvas with 1:1 zoom)
+        this.x                = 0       ; // [integer] x position of the camera
+        this.y                = 0       ; // [integer] y position of the camera
+        this.screenpartitionx = 0       ; // [integer] artifact from the MusicBox
+        this.screenpartitiony = 0       ; // [integer] artifact from the MusicBox
+        this.dx               = 15.5    ; // [float  ] speed gradient for the camera in the x axis
+        this.dy               = 15.5    ; // [float  ] speed gradient for the camera in the y axis
+        this.zoomx            = 1       ; // [integer] zoom factor for the x axis
+        this.zoomy            = 1       ; // [integer] zoom factor for the y axis
     }
     setZoom(zoomx, zoomy)
     {
         game_ctx.scale(zoomx, zoomy);
         this.zoomx *= zoomx;
         this.zoomy *= zoomy;
+    }
+    followEntity(entity)
+    {
+        this.followme = entity;
     }
     moveUp   () { this.y -= this.dy; }
     moveDown () { this.y += this.dy; }
@@ -46,9 +50,13 @@ class Camera
         this.width  = width ;
         this.height = height;
     }
-    ///////////////////////////////////////////////
-    // Following objects that are not the player //
-    ///////////////////////////////////////////////
+    //////////////////////////////////////////////////////
+    //                  snapToEntity                    //
+    // Function:                                        //
+    //     Following objects that are not the player    //
+    // Return value:                                    //
+    //     None                                         //
+    //////////////////////////////////////////////////////
     snapToEntity(entity)
     {
         this.width  = game_canvas.width  / this.zoomx;
@@ -60,11 +68,8 @@ class Camera
             this.y = (entity.pos.y + entity.height / 2) - this.height / 2;
         }
 
-        // Keep the camera within bounds
-        if (this.x < 0)                          this.x = 0;
-        if (this.y < 0)                          this.y = 0;
-        if (this.x > level.width  - this.width ) this.x = level.width  - this.width ;
-        if (this.y > level.height - this.height) this.y = level.height - this.height;
+        // Experimenting with unbounded camera to make editing a little easier
+        this.keepInBounds(false);
     }
     update(bEditMode=false)
     {
@@ -91,10 +96,17 @@ class Camera
             this.y = (this.followme.pos.y + this.followme.height / 2) - this.height / 2;
         }
 
-        // Keep the camera within bounds
-        if (this.x < 0)                          this.x = 0;
-        if (this.y < 0)                          this.y = 0;
-        if (this.x > level.width  - this.width ) this.x = level.width  - this.width ;
-        if (this.y > level.height - this.height) this.y = level.height - this.height;
+        // Experimenting with unbounded camera to make editing a little easier
+        this.keepInBounds(!bEditMode);
+    }
+    keepInBounds(bKeepInBounds)
+    {
+        if (bKeepInBounds)
+        {
+            if (this.x < 0)                          this.x = 0;
+            if (this.y < 0)                          this.y = 0;
+            if (this.x > level.width  - this.width ) this.x = level.width  - this.width ;
+            if (this.y > level.height - this.height) this.y = level.height - this.height;
+        }
     }
 }

@@ -29,6 +29,7 @@ class AnimationHandler
         this.animations[this.animations.length - 1].associated_action  = associated_action;
         this.animations[this.animations.length - 1].priority           = priority         ;
     }
+    
     //////////////////////////////////////////////////////
     //                  sortByPriority                  //
     // Function:                                        //
@@ -46,6 +47,7 @@ class AnimationHandler
         });
         if (DEBUG_MODE) console.log(this.animations);
     }
+
     /////////////////////////////////////////////////////////////////
     //                       getAnimation                          //
     // Function:                                                   //
@@ -67,6 +69,7 @@ class AnimationHandler
         });
         return returnval;
     }
+
     /////////////////////////////////////////////////////////////////
     //                       getAnimation                          //
     // Function:                                                   //
@@ -88,6 +91,7 @@ class AnimationHandler
         });
         return returnval;
     }
+
     /////////////////////////////////////////////////////////////////////////////////////
     //                              getCurrentAnimation                                //
     // Function:                                                                       //
@@ -115,6 +119,9 @@ class AnimationHandler
         for (var i = 0; i < this.animations.length; i++)
         {
             current_animation = this.animations[i];
+
+            // nominal means this action can only be found through string search (via getAnimationByAction() )
+            // instead of finding it through keypress (via keyhandler.isDown(current_animation.associated_action) )
             if (!current_animation.nominal)
             {
                 action = current_animation.associated_action;

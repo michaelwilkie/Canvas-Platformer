@@ -68,6 +68,32 @@ function ui_prepareContext(font, fontsize, text_color, background_color)
     return;
 }
 
+/////////////////////////////////////////
+//              drawLine               //
+// Function:                           //
+//     Draws a line between two points //
+// Return value:                       //
+//     none                            //
+/////////////////////////////////////////
+function ui_drawLine(srcx, srcy, dstx, dsty, line_style, line_width=2)
+{
+    var old_width       = ui_ctx.lineWidth;
+    var old_style       = ui_ctx.strokeStyle;
+
+    ui_ctx.strokeStyle  = style;
+    ui_ctx.lineWidth    = line_width;
+
+    ui_ctx.beginPath();
+    ui_ctx.moveTo(srcx, srcy);
+    ui_ctx.lineTo(dstx, dsty);
+    ui_ctx.stroke();
+
+    ui_ctx.lineWidth    = old_width;
+    ui_ctx.strokeStyle  = old_style;
+
+    return;
+}
+
 ///////////////////////////////////////////////////////////////////////
 //                           setFillColor                            //
 // Function:                                                         //
@@ -78,6 +104,7 @@ function ui_prepareContext(font, fontsize, text_color, background_color)
 function ui_setFillColor(color)
 {
     ui_ctx.fillStyle = color;
+
     return;
 }
 
@@ -105,12 +132,12 @@ function ui_drawText(text, x, y, color, alignment="center", font, fontsize)
 // Return value:                                                     //
 //     none                                                          //
 ///////////////////////////////////////////////////////////////////////
-function ui_drawBox(x, y, w, h, style, lineWidth=2)
+function ui_drawBox(x, y, w, h, style, line_width=2)
 {
     var old_width       = ui_ctx.lineWidth;
     var old_style       = ui_ctx.strokeStyle;
     ui_ctx.strokeStyle  = style;
-    ui_ctx.lineWidth    = lineWidth;
+    ui_ctx.lineWidth    = line_width;
 
     ui_ctx.beginPath();
     ui_ctx.rect(x, y, w, h);    
@@ -118,6 +145,7 @@ function ui_drawBox(x, y, w, h, style, lineWidth=2)
 
     ui_ctx.lineWidth    = old_width;
     ui_ctx.strokeStyle  = old_style;
+
     return;
 }
 
@@ -158,6 +186,8 @@ function ui_invertedClearRect(x, y, w, h)
     if (y + h < SCREEN_HEIGHT)  { ui_ctx.clearRect(rect2.x, rect2.y, rect2.w, rect2.h); }
     if (x > 0)                  { ui_ctx.clearRect(rect3.x, rect3.y, rect3.w, rect3.h); }
     if (x + w < SCREEN_WIDTH )  { ui_ctx.clearRect(rect4.x, rect4.y, rect4.w, rect4.h); }
+
+    return;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////
@@ -169,8 +199,12 @@ function ui_invertedClearRect(x, y, w, h)
 ///////////////////////////////////////////////////////////////////////////////////////
 function ui_fillBox(x, y, w, h, style)
 {
+    var old_style = ui_ctx.fillStyle;
+
     ui_ctx.fillStyle = style;
     ui_ctx.fillRect(x, y, w, h);
+
+    ui_ctx.fillStyle = old_style;
 
     return;
 }

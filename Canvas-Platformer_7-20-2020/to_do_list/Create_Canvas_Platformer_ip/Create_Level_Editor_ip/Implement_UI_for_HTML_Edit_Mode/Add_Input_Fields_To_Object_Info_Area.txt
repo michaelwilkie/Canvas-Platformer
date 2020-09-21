@@ -1,0 +1,10 @@
+Add input fields to the Object Info html element so particular properties
+of the corresponding Entity can be modified
+
+╭─────────────────────────╮
+│       Object Info       │
+│ 🔴    RED_CIRCLE        │
+│  x:   <input>           │
+│  y:   <input>           │
+│  gravity: <input> etc...│
+╰─────────────────────────╯

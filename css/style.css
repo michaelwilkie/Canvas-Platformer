@@ -4,6 +4,60 @@ body, html
     color: white;
 }
 
+/* Preventing scrolling */
+html, body {margin: 0; height: 100%; overflow: hidden}
+
+
+/* ******************************** Popup ************************************ */
+.popup
+{
+    margin          : 10px          ;
+    border-radius   : 20px          ;
+    background-color: grey        ;
+    display         : none          ;
+    position        : fixed         ;
+    z-index         : 5             ;
+    width           : 40%           ;
+    height          : 40%           ;
+    left            : 25%           ;
+    top             : 25%           ;
+}
+
+table, td, tr
+{
+    /* position    : relative; */
+    /*width       : 80%;*/
+    /* height      : 80%; */
+    text-align  : center;
+}
+
+table
+{
+    width: 100%;
+    height: 70%;
+}
+
+#html_leveldata_textarea
+{
+    width: 100%;
+    height: 100%;
+}
+
+#button_load_level_popup, #button_close_saveload_popup
+{
+    width: 100%;
+    height: 100%;
+    font-size: 20px;
+}
+
+/* **************************** Popup Cancel Button ************************** */
+#button_saveload_popup
+{
+    position: relative;
+    bottom: -20px;
+    width: 50%;
+}
+
 /* **************************** Useful animations **************************** */
 
 .tooltip 
@@ -35,9 +89,39 @@ body, html
   visibility: visible;
 }
 
+.button
+{
+    background-color: dodgerblue;
+    color           : white;
+    border-radius   : 5px;
+}
+.button:hover
+{
+    filter: brightness(150%);
+    cursor: pointer;
+}
+
 .gray-area
 {
     background-color: rgba(58, 57, 57, 0.5);
+    border-radius: 5px;
+}
+
+.tab
+{
+    background-color: black;
+    color: white;
+    border-radius: 5px;
+    cursor: pointer;
+}
+.tab:hover
+{
+    filter: brightness(120%);
+}
+.tab-selected
+{
+    background-color: white;
+    color: black;
     border-radius: 5px;
 }
 
@@ -105,6 +189,11 @@ body, html
     background-color:white;
 }
 
+.text-left
+{
+    text-align: left;
+}
+
 /* *************************** Column 1 Elements *************************** */
 
 
@@ -114,12 +203,11 @@ body, html
     font-size: 30px;
 }
 
-.col-tileset
+.col-entities
 {
     margin-right: 5px;
     font-size: 30px;
 }
-
 .col-displayoptions
 {
     font-size: 20px;
@@ -130,7 +218,6 @@ body, html
 }
 .row 
 {
-    width  : 100%;
     margin : 5px             ;
     /*border : 2px dotted red;*/
     display: flex            ;
@@ -171,6 +258,18 @@ img .selected
     left    : 0       ;
 }
 
+/* *************************** Level Settings *************************** */
+#div_level_settings
+{
+    align-content: flex-start;
+}
+
+button
+{
+    background-color: dodgerblue;
+    color           : white;
+}
+
 /* *************************** Layer Elements *************************** */
 input
 {
@@ -190,7 +289,6 @@ input:hover
 }
 i
 {
-    /*filter: brightness(150%);*/
     cursor: pointer;
 }
 /* *************************** Column 2 ********************************** */
@@ -215,17 +313,9 @@ i
 /* cursors: https://www.w3schools.com/cssref/playit.asp?filename=playcss_cursor&preval=alias */
 #div_edit_mode
 {
-    background: dodgerblue;
-    /*display: table;*/
     width: 100%;
     margin: 5px;
     text-align: center;
-    border-radius: 5px;
-}
-#div_edit_mode:hover
-{
-    filter: brightness(150%);
-    cursor: pointer;
 }
 
 #div_object_info

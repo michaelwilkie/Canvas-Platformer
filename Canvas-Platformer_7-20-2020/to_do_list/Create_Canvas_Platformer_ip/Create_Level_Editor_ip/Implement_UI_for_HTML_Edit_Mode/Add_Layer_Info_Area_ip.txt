@@ -1,0 +1,17 @@
+Add an html element displaying the contents of a layer
+
+Clicking a tile inside this html element should center the camera around 
+the corresponding entity on the game canvas
+
+        Tileset                   Layers ➕
+[] [] [] [] [] [] [] []     ➖ LayerName1 ⬆️️️⬇️
+[] [] [] [] [] [] [] []     ➖ LayerName2 ⬆️️️⬇️
+[] [] [] [] [] [] [] []     ➖ LayerName3 ⬆️️️⬇️
+[] [] [] [] [] [] [] []
+[] [] [] [] [] [] [] []
+
+       Layer Info
+LayerName       LayerSpeed
+Tiles:
+    🔴 🔵 🔺 🔻 
+    🔸  🔹 🔶 🔷

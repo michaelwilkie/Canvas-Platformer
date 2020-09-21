@@ -9,18 +9,16 @@ class Wall extends Entity
     constructor(x, y, w, h, imgsrc, framelist)
     {
         super(x, y, w, h, imgsrc, framelist);
-        this.AnimEnum = { IDLE: 0, UP: 1, DOWN: 2, LEFT: 3, RIGHT: 4 };
-        this.frame = 0;
     }
     update()
     {
-        if (this.framecooldown <= 0)
-        {
-            this.frame = this.AnimEnum.IDLE;
-            this.framecooldown = 50;
-        }
-        else
-            this.framecooldown--;
+        //if (this.framecooldown <= 0)
+        //{
+            //this.frame = this.AnimEnum.IDLE;
+            //this.framecooldown = 50;
+        //}
+        //else
+            //this.framecooldown--;
         
         super.update();
     }

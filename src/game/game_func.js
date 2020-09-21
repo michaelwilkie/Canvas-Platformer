@@ -6,15 +6,14 @@
 "use strict";
 
 function game()
-{    
-    // Wait for all images to be loaded in before attempting to play
-    if(!imagesLoaded)
+{
+    // Draw the sky
+    game_drawBackgroundColor();
+    
+    // Wait for all images and sounds to be loaded in before attempting to play
+    if(!image_all_loaded && !sound_all_loaded)
     {
-        imagesLoaded = allImagesLoaded();
-        // allImagesLoaded() sets the level object's height and width
-        // I am setting it again here to override it with these other background images.
-        level.setWidth (background_wall.width);
-        level.setHeight(background_wall.height);
+        image_all_loaded = image_allImagesLoaded();
     }
     else
     {
@@ -46,11 +45,15 @@ function game()
 
                 if (mouseselectedentity != null)
                 {
-                    mouseselectedentity.draw(playercamera, game_findLayer(html_getLayerNameFromID(html_selected_layer)).speed);
+                    mouseselectedentity.draw(playercamera, html_findLayerObjectFromSelectedLayer().speed); // selected layer id contains _span suffix
                 }
+
+                game_drawLevelBoundary();
+
                 break;
             }
         }
+
         // Obtain a copy of previously pressed keys to detect any key-press changes for the next frame
         keyhandler.updateLastKeypress();
 
@@ -147,6 +150,120 @@ function game_setGameMode(mode)
 }
 
 //////////////////////////////////////////////////////
+//             game_drawBackgroundColor             //
+// Function:                                        //
+//     Draws background color to the game canvas    //
+// Return value:                                    //
+//     None                                         //
+//////////////////////////////////////////////////////
+function game_drawBackgroundColor()
+{
+    game_ctx.beginPath();
+    game_ctx.rect(0, 0, game_canvas.width, game_canvas.height);
+    game_ctx.fillStyle = game_sky_color;
+    game_ctx.fill();
+}
+
+//////////////////////////////////////////
+//        game_drawLevelBoundary        //
+// Function:                            //
+//     Draws a red box around the level //
+// Return value:                        //
+//     none                             //
+//////////////////////////////////////////
+function game_drawLevelBoundary()
+{
+    game_drawBox
+    (
+        -playercamera.x , // x
+        -playercamera.y , // y
+        level.width     , // width
+        level.height    , // height
+        "red"             // color
+    );
+}
+
+///////////////////////////////////////////////////////////////////////
+//                             drawBox                               //
+// Function:                                                         //
+//     Draws a box with a specified position, dimensions, and style. //
+// Return value:                                                     //
+//     none                                                          //
+///////////////////////////////////////////////////////////////////////
+function game_drawBox(x, y, w, h, style, line_width=2)
+{
+    var old_width       = game_ctx.lineWidth;
+    var old_style       = game_ctx.strokeStyle;
+    game_ctx.strokeStyle= style;
+    game_ctx.lineWidth  = line_width;
+
+    game_ctx.beginPath();
+    game_ctx.rect(x, y, w, h);    
+    game_ctx.stroke();
+    game_ctx.closePath();
+
+    game_ctx.lineWidth  = old_width;
+    game_ctx.strokeStyle= old_style;
+
+    return;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//                        game_isEntityInSelectedLayer                     //
+// Function:                                                               //
+//     Determines if the parameter is in the currently selected html layer //
+// Return value:                                                           //
+//     boolean                                                             //
+/////////////////////////////////////////////////////////////////////////////
+function game_isEntityInSelectedLayer(entity)
+{
+    if (html_selected_layer == null)
+    {
+        return false;
+    }
+    else
+    {
+        ////////////////////////////////////////////////////////////////
+        // 1. Find the layer the entity is in                         //
+        // 2. Compare if that layer is the same as the selected layer //
+        ////////////////////////////////////////////////////////////////
+        var layer_object = null;
+        var found_layer = false;
+
+        for (var index_layers = 0; index_layers < layers.length; index_layers++)
+        {
+            var layer = layers[index_layers];
+            for (var index_entlist = 0; index_entlist < layer.entlist.length; index_entlist++)
+            {
+                if (entity == layer.entlist[index_entlist])
+                {
+                    layer_object = layer;
+                    found_layer = true;
+                    break;
+                }
+            }
+
+            if (found_layer)
+            {
+                break;
+            }
+        }
+
+        // The entity was not found in any layer
+        if (null == layer_object)
+        {
+            return false;
+        }
+        else
+        {
+            return layer_object == html_findLayerObjectFromSelectedLayer();
+        }
+
+    } // end of else (of if (html_selected_layer == null) )
+
+} // end of game_isEntityInSelectedLayer(entity)
+
+//////////////////////////////////////////////////////
 //              game_unselectObject                 //
 // Function:                                        //
 //     Releases any object being held by mouse      //
@@ -160,11 +277,13 @@ function game_unselectObject()
     if (mouseselectedentity != null)
     {
         // Don't want the entity to remove itself from the entlist if I'm just unselecting it
-        //mouseselectedentity.killSelf();
+        // mouseselectedentity.killSelf();
     }
     mouseselectedentity = null;
     html_selected_object = null;
-    ui_edit_mode_component.scroll_component.selectedObject = null;
+
+    // Edit mode component on the UI canvas has been disabled, so this line is commented out
+    // ui_edit_mode_component.scroll_component.selectedObject = null;
 }
 
 //////////////////////////////////////////////////
@@ -188,7 +307,9 @@ function game_deleteSelectedObject()
     // Let go of the reference of the used-to-be object
     mouseselectedentity = null;
     html_selected_object = null;
-    ui_edit_mode_component.scroll_component.selectedObject = null;
+    
+    // Edit mode component on the UI canvas has been disabled, so this line is commented out
+    // ui_edit_mode_component.scroll_component.selectedObject = null;
 
     // Show this object has been removed by refreshing the html layer object
     html_selectLayerElement(html_selected_layer);
@@ -213,7 +334,180 @@ function game_getLayerIndexByName(name)
             return i;
         }
     }
+    
     return null;
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//                              game_parseLevelString                                   //
+// Function:                                                                            //
+//     Creates a level based on the string attained from the save level textarea popup  //
+// Return value:                                                                        //
+//     None                                                                             //
+//////////////////////////////////////////////////////////////////////////////////////////
+function game_parseLevelString(strLevelList)
+{
+    var line = null;
+
+    // Empty the global variable lists
+    // so we can load a brand new level
+    game_emptyGlobalLists();
+
+    for (var i = 0; i < strLevelList.length; i++)
+    {
+        line = strLevelList[i];
+
+        // All classnames will start with upper case
+        // This makes it easier to add new classes and not come back here to accommodate
+        if (line[0] == line[0].toUpperCase())
+        {
+            i = game_createClassByString(strLevelList, i);
+        }
+        else
+        {
+            console.log("Error (line " + (i + 1) + "): property without associated classname found");
+        }
+    }
+
+    // Update the Layers area in the HTML
+    html_updateLayersScrollArea();
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//                              game_createClassByString                                //
+// Function:                                                                            //
+//     Creates an object based on the strLevelList[0]                                   //
+//     It returns the number of attributes modified before reaching the end of the list //
+//     or if it sees another class name                                                 //
+// Return value:                                                                        //
+//     Number                                                                           //
+//////////////////////////////////////////////////////////////////////////////////////////
+function game_createClassByString(strLevelList, strLevelList_index_param)
+{
+    var strLevelList_index  = strLevelList_index_param;
+    var class_name          = strLevelList[strLevelList_index];
+    var argument_list       = [];
+    var game_object         = {};
+    var i                   = strLevelList_index + 1;
+    console.log(class_name);
+    for (; i < strLevelList.length; i++)
+    {
+        var line = strLevelList[i];
+        if (line == "")
+        {
+            continue;
+        }
+        if (line[0] != line[0].toUpperCase())
+        {
+            argument_list = line.split(" ");
+
+            if (argument_list.length > 1)
+            {
+                game_object[argument_list[0]] = game_convertData(argument_list[1]);
+            }
+            else
+            {
+                // Since there's only 1 element in this line, it's the name of another object
+                var sub_object = argument_list[0];
+
+                // Create the object
+                game_object[sub_object] = {};
+
+                // Apply the two properites one at a time
+
+                // First property:
+                // Go to the next line
+                i++;
+                line = strLevelList[i];
+                argument_list = line.split(" ");
+
+                // ex: xpos 5
+                // arg[0] = xoffset
+                // arg[1] = 5
+                // game_object.collider.xoffset = 5
+                game_object[sub_object][argument_list[0]] = game_convertData(argument_list[1]);
+                
+                // Second property:
+                // Go to the next line
+                i++;
+                line = strLevelList[i];
+                argument_list = line.split(" ");
+
+                game_object[sub_object][argument_list[0]] = game_convertData(argument_list[1]);
+
+                // the collider object has 4 properties
+                if (sub_object == "collider")
+                {
+                    // Third property:
+                    // Go to the next line
+                    i++;
+                    line = strLevelList[i];
+                    argument_list = line.split(" ");
+
+                    game_object[sub_object][argument_list[0]] = game_convertData(argument_list[1]);
+
+                    // Fourth property:
+                    // Go to the next line
+                    i++;
+                    line = strLevelList[i];
+                    argument_list = line.split(" ");
+
+                    game_object[sub_object][argument_list[0]] = game_convertData(argument_list[1]);
+
+                } // end of if (sub_object == "collider")
+
+            } // end of else (of if (argument_list.length > 1))
+
+        } // end of if (line[0] != line[0].toUpperCase())
+        else
+        {
+            // A new object was found
+            break;
+        }
+    } // end of for (...)
+    
+    var new_game_object = game_createObjectFromAnotherObject(class_name, game_object);
+
+    // Pushing the objects in their configured layers
+    if (new_game_object instanceof Entity)
+    {
+        new_game_object.setLayerByIndex(game_object.layer);
+        pushToLayer(new_game_object, new_game_object.layer_name);
+
+        // Special case for player object
+        if (new_game_object instanceof Player)
+        {
+            player = new_game_object;
+            playercamera.followEntity(new_game_object);
+        }
+    }
+    else if (new_game_object instanceof Layer)
+    {
+        // Layers are added to the layers list upon creation
+    }
+    else if (new_game_object instanceof Level)
+    {
+        level = new_game_object;
+        level.setWidth(game_object.width);
+        level.setHeight(game_object.height);
+    }
+
+    // returning the index so the calling function knows where to proceed in the text file
+    // subtracting 1 because the caller of this function has yet to increment its for loop counter
+    return i - 1;
+}
+
+///////////////////////////////////////////
+//          game_emptyGlobalLists        //
+// Function:                             //
+//     Empties the global variable lists //
+// Return value:                         //
+//     None                              //
+///////////////////////////////////////////
+function game_emptyGlobalLists()
+{
+    layers = [];
+    entlist = [];
 }
 
 //////////////////////////////////////////////
@@ -246,10 +540,18 @@ function game_swapLayers(layer1, layer2)
     }
     if (index1 != null && index2 != null)
     {
+        // Tell all entities their index to the layers list has changed
+        layers[index1].entlist.forEach((ent) => ent.layer = index2);
+        layers[index2].entlist.forEach((ent) => ent.layer = index1);
+
         var temp = layers[index1];
         layers[index1] = layers[index2];
         layers[index2] = temp;
     }
+
+    entlist.forEach((ent)=>ent.updateLayerIndex());
+
+    return;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -293,7 +595,7 @@ function game_swapLayers(layer1, layer2)
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 function game_calculateRelativeMousePosition()
 {
-    var layer_speed = game_findLayer(html_getLayerNameFromID(html_selected_layer)).speed;
+    var layer_speed = html_findLayerObjectFromSelectedLayer().speed;
 
     var cursor_grid_multiples_x     = Math.floor(mousepos.x     / GRID_TIGHTNESS / layer_speed);
     var cursor_grid_multiples_y     = Math.floor(mousepos.y     / GRID_TIGHTNESS / layer_speed);
@@ -304,8 +606,8 @@ function game_calculateRelativeMousePosition()
     var camera_scale_x              = playercamera.zoomx;
     var camera_scale_y              = playercamera.zoomy;
 
-    var camera_relative_position_x  = (camera_grid_multiples_x * GRID_TIGHTNESS * layer_speed);
-    var camera_relative_position_y  = (camera_grid_multiples_y * GRID_TIGHTNESS * layer_speed);
+    var camera_relative_position_x  = (camera_grid_multiples_x * GRID_TIGHTNESS * layer_speed * layer_speed); // I don't know why I need to square layer_speed
+    var camera_relative_position_y  = (camera_grid_multiples_y * GRID_TIGHTNESS * layer_speed * layer_speed); // I don't know why I need to square layer_speed
 
     var cursor_relative_position_x  = (cursor_grid_multiples_x * GRID_TIGHTNESS * layer_speed);
     var cursor_relative_position_y  = (cursor_grid_multiples_y * GRID_TIGHTNESS * layer_speed);
@@ -320,7 +622,7 @@ function game_calculateRelativeMousePosition()
 //                  createLayer                  //
 // Function:                                     //
 //     Creates a Layer object and pushes it onto //
-//     the layers array.                         //
+//     the layers array                          //
 // Return value:                                 //
 //     Layer object                              //
 ///////////////////////////////////////////////////
@@ -344,8 +646,12 @@ function pushToLayer(ent, layer_name)
     var layer_object = game_findLayer(layer_name);
     if (layer_object != null)
     {
+        ent.layer_name = layer_object.name;
         layer_object.push(ent);
     }
+
+    ent.updateLayerIndex();
+
     return;
 }
 
@@ -372,6 +678,8 @@ function game_findLayer(layer_name)
             {
                 found_layer = true;
                 return_value = layer_object;
+
+                // using 'return' here to break out of the lambda function, not the game_findLayer function
                 return;
             }
         }
@@ -458,26 +766,141 @@ function game_saveSelectedEntityPosition(ent)
     }
 }
 
-/////////////////////////////////////////////
-//               createImage               //
-// Function:                               //
-//     Creates an image object from imgsrc //
-// Return value:                           //
-//     Image object                        //
-/////////////////////////////////////////////
-function createImageObject(imgsrc)
+///////////////////////////////////////////////////////////
+//              game_createObjectFromType                //
+// Function:                                             //
+//     Given a type, it creates the corresponding object //
+// Return value:                                         //
+//     One of the following: Tile, Wall, Player,         //
+//     Goal, Particle, Puck, Entity, Enemy               //
+///////////////////////////////////////////////////////////
+function game_createObjectFromType(string_type, x=0, y=0, tilename=null, bCreateOrphan=false)
 {
-    var img_object = null;
+    var return_object = null;
 
-    // Images are used for visible entities
-    if (imgsrc != null)
+    if (typeof string_type != 'string')
     {
-        img_object = new Image();
-        img_object.src = imgsrc;
+        throw "Invalid string: " + string_type + ", it's a type: " + typeof string_type;
     }
+    switch(string_type.toLowerCase())
+    {
+        case 'level':
+        {
+            return_object = addLevel();
+            break;
+        }
+        case 'layer':
+        {
+            return_object = createLayer();
+            break;
+        }
+        case 'player':
+        {
+            return_object = addPlayer(x, y);
+            break;
+        }
+        case 'entity':
+        {
+            return_object = addEntity(x, y);
+            break;
+        }
+        case 'tile':
+        {
+            return_object = addTile(x, y, getTileByName(tilename));
+            break;
+        }
+        case 'wall':
+        {
+            return_object = addWall(x, y, null , null, null);
+            break;
+        }
+        case 'trigger':
+        {
+            return_object = addTrigger(x, y);
+            break;
+        }
+        case 'goal':
+        {
+            console.log("Goal creation not currently implemented");
+            break;
+        }
+        case 'enemy':
+        {
+            console.log("Enemy creation not currently implemented");
+            break;
+        }
+    } // end of switch()
 
-    return img_object;
-}
+    return return_object;
+} // end of game_createObjectFromType()
+
+///////////////////////////////////////////////////////////
+//          game_createObjectFromAnotherObject           //
+// Function:                                             //
+//     Given a type, it creates the corresponding object //
+// Return value:                                         //
+//     One of the following: Tile, Wall, Player,         //
+//     Goal, Particle, Puck, Entity, Enemy               //
+///////////////////////////////////////////////////////////
+function game_createObjectFromAnotherObject(string_type, game_object)
+{
+    var return_object = null;
+
+    if (typeof string_type != 'string')
+    {
+        throw "Invalid string: " + string_type + ", it's a type: " + typeof string_type;
+    }
+    switch(string_type.toLowerCase())
+    {
+        case 'level':
+        {
+            return_object = addLevel();
+            break;
+        }
+        case 'layer':
+        {
+            return_object = createLayer(game_object.speed, game_object.name);
+            break;
+        }
+        case 'player':
+        {
+            return_object = addPlayer(game_object.pos.x, game_object.pos.y);
+            break;
+        }
+        case 'entity':
+        {
+            return_object = addEntity(game_object.pos.x, game_object.pos.y);
+            break;
+        }
+        case 'tile':
+        {
+            return_object = addTile(game_object.pos.x, game_object.pos.y, getTileByName(game_object.name));
+            break;
+        }
+        case 'wall':
+        {
+            return_object = addWall(game_object.pos.x, game_object.pos.y, game_object.width , game_object.height, game_object.imgsrc);
+            break;
+        }
+        case 'trigger':
+        {
+            return_object = addTrigger(game_object.pos.x, game_object.pos.y);
+            break;
+        }
+        case 'goal':
+        {
+            console.log("Goal creation not currently implemented");
+            break;
+        }
+        case 'enemy':
+        {
+            console.log("Enemy creation not currently implemented");
+            break;
+        }
+    } // end of switch()
+
+    return return_object;
+} // end of game_createObjectFromAnotherObject()
 
 //////////////////////////////////////////////////
 //                getTileByName                 //
@@ -530,8 +953,32 @@ function game_insertSelectedObject()
 
         pushToLayer(mouseselectedentity, layer_name);
         
-        // Duplicate the tile in case user wants to place another of the same type
-        mouseselectedentity = addTile(mouseselectedentity.pos.x, mouseselectedentity.pos.y, getTileByName(mouseselectedentity.name));
+        // If a tile on the html was clicked
+        if (html_selected_object != null)
+        {
+            // Duplicate the tile in case user wants to place another of the same type
+            mouseselectedentity = game_createObjectFromType
+                                    (
+                                        html_selected_object.type,
+                                        mouseselectedentity.pos.x,
+                                        mouseselectedentity.pos.y,
+                                        mouseselectedentity.name
+                                    );
+        }
+
+        // If a tile on the canvas was clicked
+        else
+        {
+            // Using typeof since mouseselectedentity is not a html object with a 'type' property
+            // Duplicate the tile in case user wants to place another of the same type
+            mouseselectedentity = game_createObjectFromType
+                                    (
+                                        typeof mouseselectedentity,
+                                        mouseselectedentity.pos.x,
+                                        mouseselectedentity.pos.y,
+                                        mouseselectedentity.name
+                                    );
+        }
 
         // Update the html layer info section
         html_selectLayerElement(html_selected_layer);
@@ -689,6 +1136,27 @@ function padZero(str, len)
     return (zeros + str).slice(-len);
 }
 
+////////////////////////////////////////////////////////
+//              game_drawTiledTexture                 //
+// Function:                                          //
+//     Creates a repeating pattern with the given img //
+// Return value:                                      //
+//     None                                           //
+////////////////////////////////////////////////////////
+function game_drawTiledTexture(img, x, y, width, height)
+{
+    var old_style = game_ctx.fillStyle;
+    var pattern = game_ctx.createPattern(img, "repeat");
+    game_ctx.closePath();
+
+    game_ctx.beginPath();
+    game_ctx.rect(x, y, width, height);
+    game_ctx.fillStyle = pattern;
+    game_ctx.fill();
+
+    game_ctx.fillStyle = old_style;
+}
+
 //////////////////////////////////////////////////////////
 //                      approach                        //
 // Function:                                            //
@@ -770,25 +1238,6 @@ function getScoreBoard()
     return scorebrd;
 }
 
-////////////////////////////////////////////////////////////////////
-//                      allImagesLoaded                           //
-// Function:                                                      //
-//     Checks whether or not all game resources have been loaded. //
-// Return value:                                                  //
-//     boolean                                                    //
-////////////////////////////////////////////////////////////////////
-function allImagesLoaded()
-{
-    if (level.bg_img != null)
-        if (!level.bg_img.complete)
-            return false;
-    for (var i = 0; i < entlist.length; i++)
-        if (entlist[i].img != null)
-            if (!entlist[i].img.complete)
-                return false;
-    return true;
-}
-
 //////////////////////////////////////////////////
 //                  SideEnum                    //
 // Enumerator:                                  //
@@ -843,10 +1292,13 @@ function checkSide(a, b)
     if (!(b instanceof Entity))
         return SideEnum.ERROR;
     
-    if (a.pos.y + a.height > b.pos.y + b.height && a.pos.y > b.pos.y + b.height) return SideEnum.DOWN ;
-    if (b.pos.y + b.height > a.pos.y + a.height && b.pos.y > a.pos.y + a.height) return SideEnum.UP   ;
-    if (a.pos.x + a.width  > b.pos.x + b.width  && a.pos.x > b.pos.x + b.width ) return SideEnum.RIGHT;
-    if (b.pos.x + b.width  > a.pos.x + a.width  && b.pos.x > a.pos.x + a.width ) return SideEnum.LEFT ;
+    var rect1 = {x: a.pos.x + a.collider.xoffset, y: a.pos.y + a.collider.yoffset, width: a.collider.width, height: a.collider.height};
+    var rect2 = {x: b.pos.x + b.collider.xoffset, y: b.pos.y + b.collider.yoffset, width: b.collider.width, height: b.collider.height};
+
+    if (rect1.y + rect1.height >=rect2.y + rect2.height && rect1.y >=rect2.y + rect2.height) return SideEnum.DOWN ;
+    if (rect2.y + rect2.height >=rect1.y + rect1.height && rect2.y >=rect1.y + rect1.height) return SideEnum.UP   ;
+    if (rect1.x + rect1.width  >=rect2.x + rect2.width  && rect1.x >=rect2.x + rect2.width ) return SideEnum.RIGHT;
+    if (rect2.x + rect2.width  >=rect1.x + rect1.width  && rect2.x >=rect1.x + rect1.width ) return SideEnum.LEFT ;
     
     return SideEnum.ERROR;
 }
@@ -877,14 +1329,20 @@ function checkPointCollision(rectangle, point)
 
     if (rectangle.x == null || rectangle.y == null) 
     {
-        throw (rectangle + " missing x or y property");
+        console.log(rectangle + " missing x or y property");
+        return false;
     }
     if (point.x == null || point.y == null) 
     {
-        throw (point     + " missing x or y property");
+        console.log(point     + " missing x or y property");
+        return false;
     }
 
-    if (rectangle.width == null || rectangle.height == null) throw (rectangle + " missing width or height property");
+    if (rectangle.width == null || rectangle.height == null)
+    {
+        console.log(rectangle + " missing width or height property")
+        return false;
+    }
     
     return point.x > rectangle.x && point.x < rectangle.x + rectangle.width
         && point.y > rectangle.y && point.y < rectangle.y + rectangle.height;
@@ -900,13 +1358,13 @@ function checkPointCollision(rectangle, point)
 ////////////////////////////////////////////////
 function checkCollision(a, b)
 {
-    if (!(a instanceof Entity))
+    if (a.noCollide || b.noCollide)
+    {
         return false;
-    if (!(b instanceof Entity))
-        return false;
- 
-    var rect1 = {x: a.pos.x, y: a.pos.y, width: a.width, height: a.height}
-    var rect2 = {x: b.pos.x, y: b.pos.y, width: b.width, height: b.height}
+    }
+    
+    var rect1 = {x: a.pos.x + a.collider.xoffset, y: a.pos.y + a.collider.yoffset, width: a.collider.width, height: a.collider.height};
+    var rect2 = {x: b.pos.x + b.collider.xoffset, y: b.pos.y + b.collider.yoffset, width: b.collider.width, height: b.collider.height};
  
     if (rect1.x < rect2.x + rect2.width &&
         rect1.x + rect1.width > rect2.x &&
@@ -917,25 +1375,6 @@ function checkCollision(a, b)
     }
 
     return false;
-
-    /*var xCollide = false;
-    var yCollide = false;
-    if (    (rect1.x > rect2.x && rect1.x < rect2.x + rect2.width)
-     ||     (rect1.x + rect1.width > rect2.x && rect1.x + rect1.width < rect2.x + rect2.width))
-    {
-        xCollide = true;
-    }
-
-    if (    (rect1.y > rect2.y && rect1.y < rect2.y + rect2.height)
-     ||     (rect1.y + rect1.height > rect2.y && rect1.y + rect1.height < rect2.y + rect2.height))
-    {
-        yCollide = true;
-    }
-    if (xCollide && yCollide)
-    {
-        console.log('collidin');
-    }
-    return xCollide && yCollide;*/
 }
 
 //////////////////////////////////////////////////////////////////////////////////////
@@ -985,6 +1424,18 @@ function checkPuckCollision(a, b)
                       + ((a.pos.y - b.pos.y) * (a.pos.y - b.pos.y))
                             );
     return distance < a.radius + b.radius;
+}
+
+//////////////////////////////////
+//          addLevel            //
+// Function:                    //
+//     Creates a level object   //
+// Return value:                //
+//     Level object             //    
+//////////////////////////////////
+function addLevel()
+{
+    return new Level();
 }
 
 ////////////////////////////////////////////////////
@@ -1105,6 +1556,35 @@ function addMovingWall(x, y, isVertical)
     return obj;
 }
 
+//////////////////////////////////////////////////
+//                  addTrigger                  //
+// Function:                                    //
+//     Creates a trigger object at particular   //
+//     coordinates x,y                          //
+// Return value:                                //
+//     Player object                            //
+//////////////////////////////////////////////////
+function addTrigger(x, y)
+{
+    var obj = new Trigger(x, y, 32, 32);
+    entlist.push(obj);
+    return obj;
+}
+
+/////////////////////////////////////////////////////////////
+//                       addEntity                         //
+// Function:                                               //
+//     Creates entity object at particular coordinates x,y //
+// Return value:                                           //
+//     Player object                                       //
+/////////////////////////////////////////////////////////////
+function addEntity(x, y, w, h)
+{
+    var obj = new Entity(x, y, w, h)
+    entlist.push(obj);
+    return obj;
+}
+
 /////////////////////////////////////////////////////////////
 //                       addPlayer                         //
 // Function:                                               //
@@ -1173,12 +1653,41 @@ function distance(p1, p2)
     return Math.sqrt(x*x + y*y);
 }
 
+//////////////////////////////////////////////////////
+//                  game_convertData                //
+// Function:                                        //
+//     Converts the parameter to string or number   //
+//     depending on the contents of the string      //
+// Return value:                                    //
+//     Object, Number, or String                    //
+//////////////////////////////////////////////////////
+function game_convertData(data)
+{
+    if (isNaN(Number(data)))
+    {
+        // Probably a string or object
+        if (data === "true" || data === "false")
+        {
+            return data === "true";
+        }
+        else
+        {
+            return data;
+        }
+    }
+    else
+    {
+        // This is a valid number
+        return Number(data);
+    }
+}
+
 /////////////////////////////////////////////////////////////////////////////////////////////////
 //                                          round_to                                           //
 // Function:                                                                                   //
 //     Rounds a number to the specified number of decimal places.                              //
 // Return value:                                                                               //
-//     float                                                                                   //
+//     Float                                                                                   //
 // Source:                                                                                     //
 // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/round //
 /////////////////////////////////////////////////////////////////////////////////////////////////

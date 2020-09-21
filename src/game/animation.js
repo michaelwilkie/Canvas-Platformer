@@ -10,17 +10,20 @@ class Animation
 {
     constructor(width, height, animation_index, framelist)
     {
-        this.width              = width             ; // width  of each animation in pixels (for a canvas with 1:1 zoom)
-        this.height             = height            ; // height of each animation in pixels (for a canvas with 1:1 zoom)
-        this.framelist          = framelist         ; // sequences of frames (array) in an animation to be shown
-        this.animation_index    = animation_index   ; // integer indicating which row (in a sprite table) will be animated
-        this.frame              = 0                 ; // the current frame to be shown
-        this.animfinished       = false             ; // boolean determining whether the animation has finished
-        this.updatetimer        = gamecore.animation_timer; // seconds between each frame
-        this.next_animation_time= gamecore.time.now ; // to help slow down the rate of an animation
-        this.associated_action  = null              ; // Key associated with the animation, to be set by AnimationHandler
-        this.priority           = null              ; // Used to assist in ordering within an AnimationHandler
-        this.nominal            = false             ; // Used to give custom animation actions that don't rely on key names
+        this.width              = width                     ; // [pixels ] width  of each animation in pixels (for a canvas with 1:1 zoom)
+        this.height             = height                    ; // [pixels ] height of each animation in pixels (for a canvas with 1:1 zoom)
+        this.framelist          = framelist                 ; // [array  ] sequences of frames (array) in an animation to be shown
+        this.animation_index    = animation_index           ; // [integer] integer indicating which row (in a sprite table) will be animated
+        this.frame              = 0                         ; // [integer] the current frame to be shown
+        this.frame_on_last_tick = 0                         ; // [integer] what the frame value was on the previous tick
+        this.sound_frame        = -1;                       ; // [integer] the frame to play a sound on
+        this.sound_alias        = null                      ; // [string] the alias of the sound to be played
+        this.animfinished       = false                     ; // [boolean] determines whether the animation has finished
+        this.updatetimer        = gamecore.animation_timer  ; // [seconds] between each frame
+        this.next_animation_time= gamecore.time.now         ; // [milliseconds] to help slow down the rate of an animation
+        this.associated_action  = null                      ; // [string] Key associated with the animation, to be set by AnimationHandler
+        this.priority           = null                      ; // [integer] Used to assist in ordering within an AnimationHandler
+        this.nominal            = false                     ; // [boolean] Used to give custom animation actions that don't rely on key names, but rather strings
     }
     
     /////////////////////////////////////////////////
@@ -37,8 +40,33 @@ class Animation
         this.animation_rate = animation_rate;
     }
 
+    //////////////////////////////////////////////////////////////////////////
+    //                      associateFrameWithSound                         //
+    // Function:                                                            //
+    //     Tells the animation object to play a sound on a particular frame //
+    // Return value:                                                        //
+    //     None                                                             //
+    //////////////////////////////////////////////////////////////////////////
+    associateFrameWithSound(frame, sound_alias)
+    {
+        this.sound_frame = frame;
+        this.sound_alias = sound_alias;
+    }
+
+    /////////////////////////////////////////////////////////////////
+    //                      setSoundAlias                          //
+    // Function:                                                   //
+    //     In case you need to change the sound an animation plays //
+    // Return value:                                               //
+    //     None                                                    //
+    /////////////////////////////////////////////////////////////////
+    setSoundAlias(new_sound_alias)
+    {
+        this.sound_alias = new_sound_alias;
+    }
+
     //////////////////////////////////////////////
-    //              setActionNominal            //
+    //             setActionNominal             //
     // Function:                                //
     //     Sets the this.nominal variable       //
     //     If an animation's action is nominal, //
@@ -54,6 +82,7 @@ class Animation
     {
         this.nominal = bNominal
     }
+
     /////////////////////////////////////////////////////////////////////
     //                            rewind                               //
     // Function:                                                       //
@@ -81,22 +110,38 @@ class Animation
     ////////////////////////////////////////////////////////////////////
     update()
     {
-        if (!this.animfinished)
+        this.frame_on_last_tick = this.frame;
+        
+        // Animation indeces are incremented by intervals specified by this.updatetimer
+        // |-------------------TIME-------------------->
+        // |         |                     |
+        // |         |                     |
+        // |         |--this.updatetimer-->|
+        // |         |                     |
+        // |         |                     |
+        //  gamecore.time.now   this.next_animation_time
+        if (gamecore.time.now > this.next_animation_time)
         {
-            if (this.framelist != null)
+            if (this.sound_frame != -1)
             {
-                if (this.frame == this.framelist.length - 1)
+                if (this.sound_frame == this.frame)
                 {
-                    this.animfinished = true;
+                    createjs.Sound.play(this.sound_alias);
                 }
             }
-            if (gamecore.time.now > this.next_animation_time + this.updatetimer)
+            this.frame++;
+            this.next_animation_time = gamecore.time.now + this.updatetimer;
+        }
+
+        if (this.framelist != null)
+        {
+            // If the animation reached the last frame
+            if (this.frame >= this.framelist.length)
             {
-                this.frame++;
-                this.next_animation_time = gamecore.time.now + this.updatetimer;
+                this.animfinished = true;
             }
         }
-        else
+        if (this.animfinished)
         {
             // restart the animation from the beginning
             this.rewind();

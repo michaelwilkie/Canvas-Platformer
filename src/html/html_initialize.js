@@ -71,9 +71,170 @@ function html_addElementToTileset(x, y, tilename)
     imageObject.ypos            = tile.y                ;
     imageObject.onclick         = html_imgClickHandler  ;
     imageObject.wasClicked      = false                 ;
+    imageObject.type            = 'tile'                ;
 
     html_div_tileset.appendChild(imageObject);
+
+    // Add hover-text to help the user know what they are looking at
+    $('#' + tile.name + "_HTML").prop('title', tile.name);
 }
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//                          html_addEntitiesToEntitiesTab                               //
+// Function:                                                                            //
+//     Populates the div_entities element with the game's logic entities/player/enemies //
+// Return value:                                                                        //
+//     None                                                                             //
+//////////////////////////////////////////////////////////////////////////////////////////
+function html_addEntitiesToEntitiesTab()
+{
+    html_addPlayerToEntitiesTab();
+    html_addTriggerToEntitiesTab();
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////
+//                          html_initializePopupEventHandlers                          //
+// Function:                                                                           //
+//     Initializes event handlers for the save/load popup                              //
+// Return value:                                                                       //
+//     None                                                                            //
+// Source:                                                                             //
+// https://www.tutorialspoint.com/How-to-create-a-modal-popup-using-JavaScript-and-CSS //
+/////////////////////////////////////////////////////////////////////////////////////////
+function html_initializePopupEventHandlers()
+{
+    var popup                   = document.getElementById('div_level_saveload_popup'    );
+    var saveload_button         = document.getElementById('div_level_saveload_button'   );
+    var close_saveload_button   = document.getElementById('button_close_saveload_popup' );
+    var load_level_button       = document.getElementById('button_load_level_popup'     );
+    saveload_button.onclick = function() 
+    {
+        popup.style.display = "block";
+        html_populateSaveDataTextArea();
+    }
+    close_saveload_button.onclick = function() 
+    {
+        popup.style.display = "none";
+    }
+    load_level_button.onclick = function()
+    {
+        html_parseLevelData();
+    }
+    window.onclick = function()
+    {
+        if (event.target == popup)
+        {
+            popup.style.display = "none"; 
+        }
+    }
+}
+
+////////////////////////////////////////////////
+//         html_addPlayerToEntitiesTab        //
+// Function:                                  //
+//     Adds player object to the entities tab //
+// Return value:                              //
+//     None                                   //
+////////////////////////////////////////////////
+function html_addPlayerToEntitiesTab()
+{
+    var player_object   = new Player(0, 0);
+    var new_canvas      = document.createElement("canvas");
+    var new_ctx         = new_canvas.getContext("2d");
+    var imageObject     = new Image();
+
+    new_canvas.width    = player.width;
+    new_canvas.height   = player.height;
+
+    new_ctx.drawImage
+    (
+        player.img      , // img object
+        0               , // source x (should be 0 in this case)
+        0               , // source y (should be 0 in this case)
+        player.width    , // source width
+        player.height   , // source height
+        0               , // destination x
+        0               , // destination y
+        player.width    , // destination width
+        player.height     // destination height
+    );
+
+    imageObject.src             = new_canvas.toDataURL();
+    imageObject.id              = 'player_HTML'         ;
+    imageObject.style.position  = "relative"            ;
+    imageObject.name            = 'player'              ;
+    imageObject.xpos            = player.pos.x          ;
+    imageObject.ypos            = player.pos.y          ;
+    imageObject.onclick         = html_imgClickHandler  ;
+    imageObject.wasClicked      = false                 ;
+    imageObject.type            = 'player'              ;
+
+    html_div_entities.appendChild(imageObject);
+
+    // Adding an element ruins the 'display' property of div_entities which should be, at this time, 'none'
+    $('#div_entities').css('display', 'none');
+
+    // Reference to the entity that should be copied when this html element is clicked
+    $('#player_HTML').prop('entity_reference', player_object);
+
+    // Add hover-text to help the user know what they are looking at
+    $('#player_HTML').prop('title', 'Player Object');
+
+} // end of html_addPlayerToEntitiesTab()
+
+////////////////////////////////////////////////
+//        html_addTriggerToEntitiesTab        //
+// Function:                                  //
+//     Adds player object to the entities tab //
+// Return value:                              //
+//     None                                   //
+////////////////////////////////////////////////
+function html_addTriggerToEntitiesTab()
+{
+    var trigger_object   = new Trigger(0, 0, 32, 32);
+    var new_canvas      = document.createElement("canvas");
+    var new_ctx         = new_canvas.getContext("2d");
+    var imageObject     = new Image();
+
+    new_canvas.width    = player.width;
+    new_canvas.height   = player.height;
+
+    new_ctx.drawImage
+    (
+        trigger_object.img      , // img object
+        0               , // source x (should be 0 in this case)
+        0               , // source y (should be 0 in this case)
+        trigger_object.width    , // source width
+        trigger_object.height   , // source height
+        0               , // destination x
+        0               , // destination y
+        trigger_object.width    , // destination width
+        trigger_object.height     // destination height
+    );
+
+    imageObject.src             = new_canvas.toDataURL();
+    imageObject.id              = 'trigger_HTML'        ;
+    imageObject.style.position  = "relative"            ;
+    imageObject.name            = 'trigger'             ;
+    imageObject.xpos            = trigger_object.pos.x  ;
+    imageObject.ypos            = trigger_object.pos.y  ;
+    imageObject.onclick         = html_imgClickHandler  ;
+    imageObject.wasClicked      = false                 ;
+    imageObject.type            = 'trigger'             ;
+
+    html_div_entities.appendChild(imageObject);
+
+    // Adding an element ruins the 'display' property of div_entities which should be, at this time, 'none'
+    $('#div_entities').css('display', 'none');
+
+    // Reference to the entity that should be copied when this html element is clicked
+    $('#trigger_HTML').prop('entity_reference', trigger_object);
+
+    // Add hover-text to help the user know what they are looking at
+    $('#trigger_HTML').prop('title', 'Trigger Object');
+
+} // end of html_addTriggerToEntitiesTab()
+
 //////////////////////////////////////
 //      html_initialize_globals     //
 // Function:                        //
@@ -84,11 +245,32 @@ function html_addElementToTileset(x, y, tilename)
 function html_initialize_globals()
 {
     html_div_tileset            = document.getElementById("div_tileset"          );
+    html_div_entities           = document.getElementById("div_entities"         );
     html_div_edit_mode          = document.getElementById("div_edit_mode"        );
     html_div_layers_scrollarea  = document.getElementById("div_layers_scrollarea");
     html_div_layer_info         = document.getElementById("div_layer_info"       );
     html_div_object_info        = document.getElementById("div_object_info"      );
+    html_sky_color_input        = document.getElementById("html_sky_color_input" );
 }
+
+//////////////////////////////////////////////////////////
+//       html_initializeColorPickerEventHandler         //
+// Function:                                            //
+//     Changes the color of the background of the game  //
+// Return value:                                        //
+//     None                                             //
+//////////////////////////////////////////////////////////
+function html_initializeColorPickerEventHandler()
+{
+    html_sky_color_input.addEventListener
+    (
+        "change",
+        (event) => {
+            game_sky_color = event.target.value;
+        }
+    );
+}
+
 ///////////////////////////////////////////////////////////
 //              initialize_edit_mode_html                //
 // Function:                                             //
@@ -258,4 +440,7 @@ function initialize_edit_mode_html()
     html_addElementToTileset(current_x + (5 * tile_width), current_y + (1 * tile_height), "BRIDGE_RIGHT_B"                  );
     html_addElementToTileset(current_x + (5 * tile_width), current_y + (0 * tile_height), "BRIDGE_RIGHT_A"                  );
     html_addElementToTileset(current_x + (6 * tile_width), current_y + (0 * tile_height), "BRIDGE_RIGHT_POST"               );
+
+    // Populate entities tab
+    html_addEntitiesToEntitiesTab();
 }
